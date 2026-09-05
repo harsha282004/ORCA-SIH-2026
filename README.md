@@ -15,13 +15,77 @@ The full, frozen architecture is the single source of truth for this implementat
 
 ---
 
-## Current status: Phase 4 — Data Agents
+## Problem statement
 
-This repository currently implements **Phase 0 (Infrastructure)** through **Phase 4
-(Data Agents)** of the development roadmap (architecture §44). **No LLM calls and no
-LangGraph exist yet** — the three Phase 4 agents are deterministic service components
-(architecture §10's own table marks none of them as an LLM call), fully testable with
-zero real network access via mocked HTTP and a fake Redis double.
+Marine decision-making often requires information from multiple disconnected sources:
+weather conditions, oceanographic conditions, marine hazards, coastal and marine
+boundaries, protected/restricted areas, fishing suitability, and spatial/temporal
+constraints. ORCA addresses this by integrating these sources behind a single
+conversational interface that provides context-aware, evidence-backed, safety-aware
+marine intelligence — never a raw data dump, and never a recommendation the underlying
+evidence doesn't support.
+
+## Architecture overview
+
+ORCA uses a collaborative multi-agent architecture orchestrated with **LangGraph**,
+deliberately separating language understanding/explanation (LLM) from deterministic
+computation and safety enforcement (plain code, no LLM involved):
+
+```text
+                         USER
+                          |
+                          v
+              +----------------------+
+              |  Query Understanding |
+              |        Agent         |
+              +-----------+----------+
+                          |
+                          v
+                  +---------------+
+                  |   LangGraph   |
+                  | Orchestration |
+                  +-------+-------+
+                          |
+        +-----------------+-----------------+
+        v                 v                 v
+   Weather Agent   Oceanographic       GIS &
+                       Agent          Geofencing
+        |                 |                 |
+        +-----------------+-----------------+
+                          |
+                          v
+                Risk & Suitability
+                        Agent
+                          |
+                          v
+                   Safety Guard
+                          |
+                          v
+                  Decision Engine
+                          |
+                  (Route, if requested
+                   and Safety Guard passed)
+                          |
+                          v
+              Evidence & Explanation
+                        Agent
+                          |
+                          v
+                   USER RESPONSE
+```
+
+A user could ask: *"Is it safe to go fishing near Mangaluru tomorrow morning?"* ORCA
+extracts the location/activity/time, gathers weather/wave/wind/hazard/geofence data,
+computes deterministic risk and fishing suitability, runs the Safety Guard and Decision
+Engine, and returns a grounded, evidence-backed explanation — never a decision the LLM
+invented on its own.
+
+---
+
+## Current status: Phase 5 — LangGraph Orchestration
+
+This repository currently implements **Phase 0 (Infrastructure)** through **Phase 5
+(LangGraph Orchestration)** of the development roadmap (architecture §44).
 
 **Implemented in Phase 0:** FastAPI + PostgreSQL/PostGIS + Redis + React/TS/Tailwind
 infrastructure, Docker Compose, real health/readiness checks.
@@ -46,7 +110,6 @@ detail: [`docs/data_pipeline.md`](docs/data_pipeline.md).
   contracts and outcome sets (`backend/app/policy/`, `backend/app/decision/`)
 - Lightning/cyclone hazard **proxies** — explicitly labeled as proxies, never claiming
   authoritative detection or tracking (`backend/app/risk/hazard_proxies.py`)
-- 219 tests total (212 offline, unconditionally reproducible)
 
 Full detail: [`docs/deterministic_core.md`](docs/deterministic_core.md).
 
@@ -54,18 +117,14 @@ Full detail: [`docs/deterministic_core.md`](docs/deterministic_core.md).
 - A deterministic risk-aware A* routing engine (`backend/app/routing/`) — Haversine
   heuristic and grid generation reused directly from Phase 2's `app.gis`, edge cost
   reusing Phase 2's Risk Engine components, no second GIS/risk implementation
-- Land and hard-geofence masking at the grid-cell level (reusing Phase 2's geofence hard
-  categories — land is not a separate rule), with corner-cutting explicitly prevented
+- Land and hard-geofence masking at the grid-cell level, with corner-cutting explicitly
+  prevented
 - Origin and destination validated before A* ever runs, always — coordinate range,
   routing-domain bounds, hard-geofence/land block, cell-level navigability
 - A structured `NO_ROUTE_FOUND` error when no path exists — never a partial or
   best-effort route
-- Reuses Phase 1's Temporal Validity Gate and Phase 2's confidence policy as a
-  routing-refusal gate — stale/expired/missing data or low confidence blocks routing
-  before any grid work happens
 - `POST /api/v1/route` — real HTTP endpoint, demo-fixture-backed, clearly labeled
   `data_quality="fixture"` in every response, never presented as live
-- 270 tests total (263 offline, unconditionally reproducible)
 
 Full detail: [`docs/routing.md`](docs/routing.md).
 
@@ -78,24 +137,45 @@ Full detail: [`docs/routing.md`](docs/routing.md).
   Redis-backed caching with deterministic keys, and DEMO-mode-only synthetic fallback —
   LIVE mode never silently substitutes synthetic data (architecture §16a)
 - `POST /api/v1/route` now backed by real (bounded, sampled) live environmental data
-  instead of Phase 3's flat fixture — verified end-to-end via a real HTTP call
-  (~12.5s, correct varying per-cell risk scores); Phase 3's A*/cost/grid code is
-  completely unmodified
-- 347 tests total (340 offline, unconditionally reproducible)
+  instead of Phase 3's flat fixture; Phase 3's A*/cost/grid code is completely unmodified
 
 Full detail: [`docs/data_agents.md`](docs/data_agents.md).
 
+**Implemented in Phase 5:**
+- LangGraph orchestration (`backend/app/orchestration/`) — a typed graph wiring Query
+  Understanding → parallel Weather/Oceanographic/GIS → Risk & Suitability → Safety
+  Guard → Decision Engine → (conditional Route) → Evidence & Explanation, with the
+  Safety Guard/Decision Engine structurally un-bypassable by the LLM
+- The LLM Provider Abstraction Layer (`backend/app/llm/`) — Claude, Gemini, and Grok
+  adapters (none mandatory, none SDK-dependent) plus a `FakeLLMProvider` that powers the
+  entire test suite with zero network/API-key dependency
+- The Query Understanding Agent — converts natural language into structured intent
+  without ever inventing coordinates or timestamps
+- The Risk & Suitability Agent — a thin wrapper around Phase 2's unmodified engines
+- The Evidence & Explanation Agent — grounded only in a Decision Provenance Graph
+  snapshot, with a post-generation grounding + no-false-safety-claim check and a
+  deterministic templated fallback
+- Multi-turn session state (`backend/app/session/`) that never treats cached
+  environmental data as still current
+- Language handling for English/Hindi/Kannada, with machine-readable outcomes kept
+  language-neutral
+- `POST /api/v1/query` — the conversational entrypoint, architecture §34's response
+  envelope
+
+Full detail: [`docs/orchestration.md`](docs/orchestration.md).
+
 **Explicitly NOT implemented yet** (belongs to later phases):
-LLM calls of any kind, LangGraph orchestration, the Query Understanding / Risk &
-Suitability / Evidence & Explanation / Route agents, the Decision Provenance Graph, the
-Alert Engine, the Scenario Engine, and the full map/visualization interface. Static GIS
-datasets (coastline, bathymetry, protected areas, EEZ) have not been acquired yet — the
-`DEMO_BBOX` they'd be clipped to is still a proposal pending confirmation, so every
-geofence used remains a labeled fixture, not real data. `routes`/`route_segments`
-persistence (architecture §33) remains deliberately unimplemented — see `docs/routing.md`
-§13 for why. The corresponding backend directories for later-phase components (`llm/`,
-`orchestration/`, `provenance/`, `alerts/`, `scenario/`, `i18n/`, `session/`) exist (per
-the architecture's frozen repository structure, §42) but are intentionally empty.
+Route computation from a conversational query (no vessel-origin concept exists yet —
+`POST /api/v1/route` remains the only way to compute an actual route). Official-advisory
+ingestion, evidence arbitration/conflict resolution across multiple sources, and
+alternative-site search. The Alert Engine, the Scenario Engine, and the full map/
+visualization interface. Static GIS datasets (coastline, bathymetry, protected areas,
+EEZ) have not been acquired yet — the `DEMO_BBOX` they'd be clipped to is still a
+proposal pending confirmation, so every geofence used remains a labeled fixture, not
+real data. `routes`/`route_segments` persistence (architecture §33) remains deliberately
+unimplemented — see `docs/routing.md` §13 for why. The corresponding backend directories
+for later-phase components (`alerts/`, `scenario/`) exist (per the architecture's frozen
+repository structure, §42) but are intentionally empty.
 
 ---
 
@@ -225,9 +305,10 @@ Opens at http://localhost:3000 (or the port Vite reports). Set `VITE_API_BASE_UR
 
 See [`.env.example`](.env.example) for the full list of recognized variables. Never
 commit a real `.env` file — it is gitignored. `LLM_PROVIDER` / `LLM_MODEL` / `LLM_API_KEY`
-remain configuration placeholders only; no LLM provider is called yet (architecture
-§11a, §23 "LLM ≠ Safety Authority"). `DEMO_BBOX_*` is a **proposed** value — see
-[`docs/demo_region.md`](docs/demo_region.md).
+select and configure the LLM Provider Abstraction Layer (architecture §11a); set
+`LLM_PROVIDER` to `claude`, `gemini`, or `grok` (with a matching key/model) to enable
+`POST /api/v1/query`'s LLM-backed agents, or `fake` for a zero-dependency local demo.
+`DEMO_BBOX_*` is a **proposed** value — see [`docs/demo_region.md`](docs/demo_region.md).
 
 ---
 
@@ -238,10 +319,11 @@ Matches the architecture's frozen repository structure (§42). See
 `backend/app/data/`, `backend/app/fabric/`, `backend/app/models/` (Phase 1),
 `backend/app/gis/`, `backend/app/risk/`, `backend/app/reasoning/`,
 `backend/app/suitability/`, `backend/app/policy/`, `backend/app/decision/` (Phase 2),
-`backend/app/routing/` (Phase 3), and `backend/app/agents/` (Phase 4) are now
-implemented. Directories still empty (`llm/`, `orchestration/`, `provenance/`,
-`alerts/`, `i18n/`, `session/`, `scenario/`) are reserved for later phases and contain
-only a `.gitkeep`.
+`backend/app/routing/` (Phase 3), `backend/app/agents/` (Phase 4), and
+`backend/app/llm/`, `backend/app/orchestration/`, `backend/app/provenance/`,
+`backend/app/i18n/`, `backend/app/session/` (Phase 5) are now implemented. Directories
+still empty (`alerts/`, `scenario/`) are reserved for later phases and contain only a
+`.gitkeep`.
 
 ---
 
@@ -257,16 +339,16 @@ Development proceeds strictly in order, with validation between each phase
    see `docs/deterministic_core.md`)
 4. ~~**Phase 3 — Routing**~~ (risk-aware A*, origin/destination validation gates, hard
    geofence blocking, "no route found" structured error; see `docs/routing.md`)
-5. ~~**Phase 4 — Data agents**~~ (this repository's current state — Weather/
-   Oceanographic/GIS agents, Redis caching, 3-tier fallback, real agent-backed routing;
-   see `docs/data_agents.md`)
-6. **Phase 5 — LangGraph orchestration**: full agent graph, LLM Provider Abstraction
-   Layer, language detection, multi-turn session state
-7. **Phase 6 — Evidence, provenance, explanation**: Decision Provenance Graph, grounding
-   checks, localized explanation generation
+5. ~~**Phase 4 — Data agents**~~ (Weather/Oceanographic/GIS agents, Redis caching,
+   3-tier fallback, real agent-backed routing; see `docs/data_agents.md`)
+6. ~~**Phase 5 — LangGraph orchestration**~~ (full agent graph, LLM Provider Abstraction
+   Layer, language detection, multi-turn session state, `POST /api/v1/query`; see
+   `docs/orchestration.md`)
+7. **Phase 6 — Evidence, provenance, explanation hardening**: multi-source evidence
+   arbitration/conflict resolution, official-advisory ingestion, alternative-site search
 8. **Phase 7 — Frontend/map**: risk heatmap, evidence/provenance panels, Agent Activity
    panel
 9. **Phase 8 — Fallback, testing, demo hardening**
 
 No phase begins before the previous one is validated. This repository does not implement
-Phase 5 or later — that is deliberate.
+Phase 6 or later — that is deliberate.
