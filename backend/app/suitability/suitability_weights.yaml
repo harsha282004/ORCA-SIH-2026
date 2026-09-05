@@ -1,0 +1,14 @@
+# ORCA Fishing Suitability Engine configuration — architecture.md §21.
+#
+# "Zone Score = Suitability Signal (SST/chlorophyll/PFZ-reference proximity)
+#  + Safety (inverse of Risk Engine score) + Distance + Data Confidence"
+#
+# The architecture gives this formula conceptually with "weights
+# configurable" but no specific numeric split. This even split is Phase 2's
+# own starting point — an ORCA project methodology choice, not a frozen
+# architectural number, and not a scientific/regulatory standard.
+suitability_weights:
+  signal: 0.25
+  safety: 0.35
+  distance: 0.20
+  data_confidence: 0.20

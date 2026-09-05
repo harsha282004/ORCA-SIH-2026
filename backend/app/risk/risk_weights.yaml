@@ -1,0 +1,55 @@
+# ORCA Risk Engine configuration — architecture.md §22.
+#
+# IMPORTANT — read before editing:
+# These weights, thresholds, and the confidence weights below are ORCA's
+# own configurable project methodology. They are NOT a scientific
+# standard, NOT a regulatory standard, and NOT an official government
+# threshold. They are versioned here specifically so they can be
+# inspected, explained, and tuned without a redeploy (architecture.md §22).
+
+# Frozen by architecture.md §22 — must sum to 1.0, enforced at load time
+# (fail fast, never silently re-normalized).
+risk_weights:
+  wave: 0.25
+  wind: 0.15
+  advisory_or_hazard_flag: 0.20
+  lightning_thunderstorm_proxy: 0.10
+  restricted_zone_distance: 0.15
+  coast_distance: 0.10
+  data_confidence_penalty: 0.05
+
+# Frozen by architecture.md §22's worked example:
+#   risk_score <  low_max                      -> LOW
+#   low_max <= risk_score < moderate_max        -> MODERATE
+#   risk_score >= moderate_max                  -> HIGH
+risk_thresholds:
+  low_max: 0.33
+  moderate_max: 0.66
+
+# Frozen by architecture.md §22 — must sum to 1.0. Computed and stored
+# separately from risk_score, never folded into it (except via the
+# explicit data_confidence_penalty risk component above, which is its own
+# named factor, not a re-use of this formula).
+confidence_weights:
+  freshness: 0.40
+  completeness: 0.35
+  agreement: 0.25
+
+# architecture.md §29a: cyclone_proxy weights — "mirroring the Risk
+# Engine's own pattern... stored in the same versioned config, not
+# hardcoded." No numeric split is given by the architecture beyond naming
+# the five components; this even split is Phase 2's own starting point,
+# documented as such and trivially retunable here.
+cyclone_proxy_weights:
+  pressure_tendency: 0.20
+  sustained_wind: 0.20
+  wind_gust: 0.20
+  spatial_persistence: 0.20
+  temporal_persistence: 0.20
+
+# Referenced by architecture.md §23 as `CONFIG.min_confidence_threshold`
+# but no numeric value is given anywhere in the architecture text. This
+# default is a Phase 2 engineering choice, not a frozen architectural
+# number — tune here without touching code.
+safety:
+  min_confidence_threshold: 0.5

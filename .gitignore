@@ -1,0 +1,37 @@
+.env
+.env.*
+!.env.example
+!frontend/.env.example
+
+__pycache__/
+*.py[cod]
+
+.pytest_cache/
+.venv/
+venv/
+.mypy_cache/
+
+node_modules/
+
+dist/
+build/
+.vite/
+*.tsbuildinfo
+
+coverage/
+
+.vscode/
+.idea/
+
+*.log
+
+.DS_Store
+Thumbs.db
+
+tmp/
+temp/
+
+# Phase 1: raw API pulls are transient/regenerable, never hand-curated —
+# keep the directory tracked, not its timestamped contents.
+data/raw/*
+!data/raw/.gitkeep

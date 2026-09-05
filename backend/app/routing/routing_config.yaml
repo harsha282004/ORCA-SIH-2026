@@ -1,0 +1,33 @@
+# ORCA Routing Engine configuration — architecture.md §26.
+#
+# IMPORTANT: the cost weights below are ORCA engineering parameters, not
+# regulatory maritime standards — same status as the Risk Engine's own
+# weights (backend/app/risk/risk_weights.yaml). The minimum-confidence
+# threshold for routing is intentionally NOT duplicated here — it reuses
+# Phase 2's app.risk.config.RiskConfig.safety.min_confidence_threshold
+# directly, so there is exactly one place that number can be tuned.
+
+grid:
+  # Matches Phase 2's documented engineering default (docs/deterministic_core.md
+  # §6) — reused here, not silently changed, per the Phase 3 task instruction.
+  resolution_km: 3.0
+  # Resource-safety cap (a bbox+resolution combination producing more cells
+  # than this is rejected before grid generation, never silently truncated).
+  max_cells: 20000
+
+search:
+  # A* expansion budget — exceeding this raises a structured
+  # RoutingResourceLimitError rather than letting the search run unbounded.
+  max_expanded_nodes: 200000
+
+# architecture.md §26: "edge_cost = distance_cost + environmental_risk_cost
+# + hazard_cost + geofence_cost" is given as an unweighted sum; these
+# coefficients make each term's relative influence configurable (per
+# architecture.md §4's "configuration over hardcoding" principle) while
+# preserving that exact four-term additive structure — weight 1.0 for all
+# four reduces to the architecture's literal formula.
+cost_weights:
+  distance: 1.0
+  environmental_risk: 5.0
+  hazard: 5.0
+  geofence_soft: 3.0
