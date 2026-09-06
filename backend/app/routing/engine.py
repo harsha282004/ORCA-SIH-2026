@@ -52,7 +52,16 @@ def calculate_route(
     data_quality: DataQuality,
     routing_config: RoutingConfig | None = None,
     risk_config: RiskConfig | None = None,
+    cell_penalties: dict[tuple[int, int], float] | None = None,
 ) -> RouteResult:
+    """`cell_penalties` (Phase 5, optional, default None): a map of
+    `(row, col) -> alternative_penalty` applied to the freshly-built grid
+    before A* runs — the ONLY mechanism `app.routing.alternatives` uses to
+    steer a re-run toward a genuinely different corridor (see
+    `app.routing.costs`'s module docstring). `None`/`{}` reproduces every
+    pre-Phase-5 call's exact behavior; this parameter is never populated by
+    `POST /api/v1/route`'s own single-route path.
+    """
     routing_config = routing_config or get_routing_config()
     risk_config = risk_config or get_risk_config()
     at_time = request.requested_time or datetime.now(timezone.utc)
@@ -80,6 +89,15 @@ def calculate_route(
         hazard_provider=hazard_provider,
         at_time=at_time,
     )
+
+    if cell_penalties:
+        for rc, penalty in cell_penalties.items():
+            node = nodes.get(rc)
+            # A non-navigable cell (land/hard geofence) stays non-navigable —
+            # penalizing it further is meaningless and never makes it
+            # traversable (task §6/§16: hard constraints stay hard).
+            if node is not None and node.navigable:
+                nodes[rc] = node.model_copy(update={"alternative_penalty": penalty})
 
     origin_rc = locate_cell(
         bbox, resolution_km=resolution_km, latitude=request.origin.latitude, longitude=request.origin.longitude
@@ -193,6 +211,7 @@ def _build_result(
         environmental_risk_cost=sum(e.environmental_risk_cost for e in edge_costs),
         hazard_cost=sum(e.hazard_cost for e in edge_costs),
         geofence_cost=sum(e.geofence_cost for e in edge_costs),
+        alternative_penalty_cost=sum(e.alternative_penalty_cost for e in edge_costs),
         total_cost=total_cost,
         cell_count=len(path),
         average_risk_score=(sum(risk_scores) / len(risk_scores)) if risk_scores else None,

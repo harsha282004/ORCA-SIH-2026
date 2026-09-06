@@ -132,3 +132,53 @@ def parse_hourly_observations(
         )
 
     return observations
+
+
+def parse_hourly_timeseries(
+    raw: RawResponse,
+    *,
+    parameters: list[str],
+    source_name: str,
+) -> list[dict]:
+    """Phase 1 (Marine Data Foundation) addition — the FULL multi-timestep
+    hourly series from the same Open-Meteo response `parse_hourly_observations`
+    already reduces to one representative step. Never replaces that
+    function (agents still need exactly one resolved value per call); this
+    is a second, additive reading of the SAME already-fetched raw payload,
+    reusing its own `_parse_times`/unit-normalization helpers so both
+    representations stay byte-for-byte consistent with each other.
+
+    Returns one dict per (timestamp, parameter) pair:
+        {timestamp, parameter, value, unit, is_missing}
+    Never fabricates a value for a missing/null series entry — recorded as
+    is_missing=True with value=None instead.
+    """
+    payload = raw.payload
+    hourly = payload.get("hourly")
+    if not isinstance(hourly, dict):
+        raise SourceResponseError(f"{source_name} response missing 'hourly' block")
+
+    times = hourly.get("time")
+    if not isinstance(times, list) or not times:
+        raise SourceResponseError(f"{source_name} response missing 'hourly.time'")
+
+    parsed_times = _parse_times(times, source_name)
+    units = payload.get("hourly_units", {})
+    if not isinstance(units, dict):
+        raise SourceResponseError(f"{source_name} response has a malformed 'hourly_units' block")
+
+    records: list[dict] = []
+    for parameter in parameters:
+        series = hourly.get(parameter)
+        source_unit = units.get(parameter, "")
+        for idx, observed_at in enumerate(parsed_times):
+            if not isinstance(series, list) or idx >= len(series) or series[idx] is None:
+                records.append({"timestamp": observed_at, "parameter": parameter, "value": None, "unit": source_unit or "unknown", "is_missing": True})
+                continue
+            try:
+                value, unit = normalize_unit(parameter, float(series[idx]), source_unit)
+                records.append({"timestamp": observed_at, "parameter": parameter, "value": value, "unit": unit, "is_missing": False})
+            except (UnknownUnitError, TypeError, ValueError):
+                records.append({"timestamp": observed_at, "parameter": parameter, "value": None, "unit": source_unit or "unknown", "is_missing": True})
+
+    return records

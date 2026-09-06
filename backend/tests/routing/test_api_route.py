@@ -48,11 +48,31 @@ class FakeEnvironmentalProvider:
         return 0.0
 
 
+class FakeHazardCache:
+    """Phase 4: an in-memory, network-free stand-in for `AgentCache`,
+    pre-seeded with an EMPTY cyclone list so `hazards_near_route` never
+    attempts a live GDACS request in this offline test suite.
+    """
+
+    def __init__(self):
+        from app.hazard.cyclone import CYCLONE_CACHE_KEY
+
+        self._store: dict = {CYCLONE_CACHE_KEY: []}
+
+    def get_json(self, key: str):
+        return self._store.get(key)
+
+    def set_json(self, key: str, value) -> None:
+        self._store[key] = value
+
+
 @pytest.fixture(autouse=True)
 def _fake_environmental_provider():
     app.dependency_overrides[route_module.get_environmental_provider_class] = lambda: FakeEnvironmentalProvider
+    app.dependency_overrides[route_module.get_hazard_cache] = lambda: FakeHazardCache()
     yield
     app.dependency_overrides.pop(route_module.get_environmental_provider_class, None)
+    app.dependency_overrides.pop(route_module.get_hazard_cache, None)
 
 
 def test_route_endpoint_returns_feasible_route_for_open_water() -> None:
@@ -66,6 +86,89 @@ def test_route_endpoint_returns_feasible_route_for_open_water() -> None:
     assert body["data"]["mode"] == "demo"
     assert "not an official maritime navigation recommendation" in body["data"]["disclaimer"]
     assert body["confidence"] is not None
+    # Phase 4 §19/20: always present, even when empty — never silently omitted.
+    assert body["data"]["hazards_near_route"] == []
+    assert body["data"]["hazard_source_tier"] == "cached"  # FakeHazardCache pre-seeds an empty cyclone list
+
+
+def test_route_endpoint_default_response_includes_route_level_safety_fields() -> None:
+    """Phase 5 (task §9/§11): even a plain, single-route request (the
+    default, max_alternatives=1) now exposes a deterministic route-level
+    risk_level/safety/decision/label — additive fields only, the existing
+    metrics/feasibility_status/etc. are untouched.
+    """
+    response = client.post("/api/v1/route", json={"origin": OPEN_WATER_A, "destination": OPEN_WATER_B})
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["data"]["label"] == "A"
+    assert body["data"]["risk_level"] in ("LOW", "MODERATE", "HIGH")
+    assert body["data"]["safety"]["outcome"] in ("PASS", "BLOCK_BOUNDARY", "BLOCK_MISSING_DATA", "BLOCK_LOW_CONFIDENCE", "BLOCK_HAZARD")
+    assert body["data"]["decision"]["outcome"] in ("RECOMMEND", "RECOMMEND_WITH_CAUTION", "PROVIDE_ALTERNATIVES", "NO_SAFE_RECOMMENDATION")
+    # Default max_alternatives=1 — never a shape-shifting response.
+    assert body["alternatives"] == []
+    assert body["comparison"] is None
+
+
+def test_route_endpoint_generates_bounded_alternatives_when_requested() -> None:
+    response = client.post(
+        "/api/v1/route",
+        json={"origin": OPEN_WATER_A, "destination": OPEN_WATER_B, "max_alternatives": 3},
+    )
+    body = response.json()
+
+    assert response.status_code == 200
+    assert len(body["alternatives"]) <= 2  # at most max_alternatives - 1 additional routes
+    if body["alternatives"]:
+        assert body["comparison"] is not None
+        assert body["comparison"]["recommended_label"] in ("A",) + tuple(a["label"] for a in body["alternatives"])
+        # every alternative carries the same full safety/decision shape as the primary route
+        for alt in body["alternatives"]:
+            assert alt["risk_level"] in ("LOW", "MODERATE", "HIGH")
+            assert "decision" in alt and "safety" in alt
+            assert alt["hazards_near_route"] == body["data"]["hazards_near_route"] or isinstance(alt["hazards_near_route"], list)
+    else:
+        assert body["comparison"] is None
+
+
+def test_route_endpoint_rejects_max_alternatives_out_of_range() -> None:
+    response = client.post(
+        "/api/v1/route",
+        json={"origin": OPEN_WATER_A, "destination": OPEN_WATER_B, "max_alternatives": 6},
+    )
+    assert response.status_code == 422  # pydantic validation, before any routing logic runs
+
+
+def test_route_endpoint_reports_a_real_cyclone_hazard_near_the_computed_path(monkeypatch) -> None:
+    """Phase 4 §19/20: a cyclone near the route's own path must be
+    disclosed in the response, with a real measured distance — never
+    silently dropped just because the route itself remains FEASIBLE by the
+    existing A*/cost-only definition.
+    """
+    from app.hazard.cyclone import CYCLONE_CACHE_KEY
+    from app.hazard.models import Hazard
+
+    # Well within RELEVANCE_RADIUS_KM (800km) of the OPEN_WATER_A/B corridor.
+    near_cyclone = Hazard(
+        hazard_type="CYCLONE", severity="CRITICAL", title="Test Cyclone", description="",
+        latitude=13.0, longitude=74.5, source="GDACS (test fixture)", is_authoritative=True,
+    )
+
+    class SeededCache(FakeHazardCache):
+        def __init__(self):
+            self._store = {CYCLONE_CACHE_KEY: [near_cyclone.model_dump(mode="json")]}
+
+    app.dependency_overrides[route_module.get_hazard_cache] = lambda: SeededCache()
+
+    response = client.post("/api/v1/route", json={"origin": OPEN_WATER_A, "destination": OPEN_WATER_B})
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["data"]["hazard_source_tier"] == "cached"
+    hazards = body["data"]["hazards_near_route"]
+    assert len(hazards) == 1
+    assert hazards[0]["hazard_type"] == "CYCLONE"
+    assert hazards[0]["distance_km"] is not None and hazards[0]["distance_km"] >= 0
 
 
 def test_route_endpoint_rejects_destination_inside_land_fixture() -> None:

@@ -1,0 +1,793 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.15494009852409363,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.596875,
+          12.746875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.14432545006275177,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.790625,
+          12.746875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.14702200889587402,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.984375,
+          12.746875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.13954342901706696,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.178125,
+          12.746875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.2438759207725525,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.371875,
+          12.746875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.5266532897949219,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.565625,
+          12.746875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 3.7965431213378906,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.75937499999999,
+          12.746875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.15422244369983673,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.790625,
+          12.840625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.14187321066856384,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.984375,
+          12.840625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.16749468445777893,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.178125,
+          12.840625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.14263629913330078,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.371875,
+          12.840625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.576831579208374,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.565625,
+          12.840625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 5.404764175415039,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.75937499999999,
+          12.840625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.15218585729599,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.596875,
+          12.934375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.14583691954612732,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.790625,
+          12.934375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.15954507887363434,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.984375,
+          12.934375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.1951909214258194,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.178125,
+          12.934375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.3773758113384247,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.371875,
+          12.934375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.7668672800064087,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.565625,
+          12.934375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 7.290487289428711,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.75937499999999,
+          12.934375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.14399707317352295,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.596875,
+          13.028125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.14108435809612274,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.790625,
+          13.028125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.18407097458839417,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.984375,
+          13.028125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.22879821062088013,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.178125,
+          13.028125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.38158804178237915,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.371875,
+          13.028125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.8409771919250488,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.565625,
+          13.028125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 7.379112243652344,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.75937499999999,
+          13.028125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.1495988368988037,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.596875,
+          13.121875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.18678349256515503,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.790625,
+          13.121875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.1702524870634079,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.984375,
+          13.121875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.1942739486694336,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.178125,
+          13.121875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.27265799045562744,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.371875,
+          13.121875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.7508555054664612,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.565625,
+          13.121875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.16852527856826782,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.596875,
+          13.215625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.155512273311615,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.790625,
+          13.215625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.16599982976913452,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.984375,
+          13.215625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.21468108892440796,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.178125,
+          13.215625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.28864508867263794,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.371875,
+          13.215625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 2.051445960998535,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.565625,
+          13.215625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.15605118870735168,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.596875,
+          13.309375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.1739163100719452,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.790625,
+          13.309375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.16395555436611176,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.984375,
+          13.309375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.20068101584911346,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.178125,
+          13.309375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.3067995607852936,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.371875,
+          13.309375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 1.4815248250961304,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.565625,
+          13.309375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.1543577015399933,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.596875,
+          13.403125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.15236210823059082,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.790625,
+          13.403125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.16295158863067627,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.984375,
+          13.403125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.1659378707408905,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.178125,
+          13.403125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 0.3376135528087616,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.371875,
+          13.403125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 1.415132761001587,
+        "unit": "mg/m^3",
+        "parameter": "chl"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.565625,
+          13.403125
+        ]
+      }
+    }
+  ],
+  "properties": {
+    "dataset": "INCOIS Chlorophyll Concentration",
+    "parameter": "chl",
+    "provider": "ESSO-INCOIS (Indian National Centre for Ocean Information Services)",
+    "source_url": "https://incois.gov.in/geoportal/MFASPFZ/index.html",
+    "access_method": "OGC WMS GetFeatureInfo, layer 'chl', https://incois.gov.in/geoserver/PFZ-TUNA-SST-CHL/wms",
+    "acquired_at": "2026-09-06T11:00:28.726054+00:00",
+    "crs": "EPSG:4326",
+    "unit": "mg/m^3",
+    "unit_confidence": "inferred from value ranges and INCOIS's published PFZ methodology \u2014 not independently confirmed via service metadata (see app.data.incois_wms module docstring)",
+    "bbox": {
+      "min_lat": 12.7,
+      "min_lon": 73.5,
+      "max_lat": 13.45,
+      "max_lon": 75.05
+    },
+    "grid_resolution": "8x8 bounded point samples",
+    "sample_count_requested": 64,
+    "sample_count_with_value": 51,
+    "temporal_semantics": "single current operational snapshot \u2014 no WMS time dimension is advertised by this service",
+    "authoritative": true,
+    "classification": "dynamic"
+  }
+}

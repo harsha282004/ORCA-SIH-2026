@@ -162,6 +162,49 @@ def test_all_sources_unavailable_raises(fake_redis) -> None:
 
 
 @respx.mock
+def test_transient_rate_limit_is_retried_once_and_succeeds(fake_redis) -> None:
+    """Phase 11 QA finding: Open-Meteo Marine returns HTTP 429 "Too many
+    concurrent requests" intermittently under the routing endpoint's own
+    16-way concurrent sample fetch (`app.agents.environmental_provider`) —
+    reproduced against the real live API. architecture.md §38's "retry
+    once w/ backoff" (already implemented for LLM providers,
+    `app.llm.provider.retry_once_with_backoff`) is reused here so a single
+    transient 429 no longer degrades an otherwise-successful fetch to the
+    synthetic/cached tier.
+    """
+    cache = AgentCache(fake_redis, ttl_seconds=60)
+    respx.get(BASE_URL).mock(
+        side_effect=[httpx.Response(429, json={"error": True, "reason": "Too many concurrent requests"}), httpx.Response(200, json=VALID_PAYLOAD)]
+    )
+
+    observations, tier = fetch_with_fallback(
+        adapter=make_adapter(), cache=cache, namespace="weather", latitude=13.0, longitude=74.3,
+        requested_time=NOW, max_staleness=timedelta(minutes=30), mode="demo",
+    )
+
+    assert tier == "live"
+    assert len(observations) == 5
+
+
+@respx.mock
+def test_persistent_rate_limit_still_falls_back_and_reports_the_reason(fake_redis) -> None:
+    cache = AgentCache(fake_redis, ttl_seconds=60)  # empty — nothing cached
+    respx.get(BASE_URL).mock(return_value=httpx.Response(429, json={"error": True, "reason": "Too many concurrent requests"}))
+
+    with pytest.raises(AllSourcesUnavailableError) as exc_info:
+        fetch_with_fallback(
+            adapter=make_adapter(), cache=cache, namespace="weather", latitude=13.0, longitude=74.3,
+            requested_time=NOW, max_staleness=timedelta(minutes=30), mode="demo",
+        )
+
+    # The underlying reason must be visible (SourceAdapterError's own
+    # docstring: "Never silently swallowed") — previously this was a bare
+    # `except SourceAdapterError: pass`, discarding it entirely.
+    assert "429" in str(exc_info.value)
+    assert "Too many concurrent requests" in str(exc_info.value)
+
+
+@respx.mock
 def test_timeout_also_falls_back_to_cache(fake_redis) -> None:
     cache = AgentCache(fake_redis, ttl_seconds=60)
     respx.get(BASE_URL).mock(return_value=httpx.Response(200, json=VALID_PAYLOAD))

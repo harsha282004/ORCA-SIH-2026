@@ -46,6 +46,15 @@ class RoutingNode(BaseModel):
     risk_score: float | None = None
     hazard_score: float | None = None
     geofence_soft_penalty: float = 0.0
+    # Phase 5 — deterministic ALTERNATIVE-ROUTE generation (app.routing
+    # .alternatives). Zero for every cell by default, so a route computed
+    # without alternatives is byte-for-byte identical to Phase 3/4's
+    # behavior. When generating a 2nd/3rd alternative, cells already used by
+    # a previously-found route are annotated with a positive penalty here —
+    # a SOFT cost signal only (never navigable=False), so a genuinely
+    # necessary reuse of the same corridor (e.g. a narrow strait) is still
+    # possible, just costlier. See app.routing.costs for the exact formula.
+    alternative_penalty: float = 0.0
 
     @property
     def row(self) -> int:

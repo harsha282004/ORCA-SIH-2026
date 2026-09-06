@@ -22,7 +22,45 @@ of truth.
 """
 from __future__ import annotations
 
+from app.agents.risk_suitability.models import RiskSuitabilityResult
+from app.gis.geofence import GeofenceCheckResult
+from app.models.contracts import AgentResult
 from app.policy.models import SafetyFacts, SafetyGuardResult
+
+
+def derive_safety_facts(
+    *,
+    weather: AgentResult | None,
+    marine: AgentResult | None,
+    boundary_check: GeofenceCheckResult | None,
+    risk_suitability: RiskSuitabilityResult | None,
+) -> SafetyFacts:
+    """Builds `SafetyFacts` from the raw pipeline state — the exact
+    derivation `OrchestrationNodes.safety_guard` uses for a live query,
+    extracted here so the Scenario Engine (architecture.md §32, "re-run
+    ... Safety Guard on the perturbed state") can re-derive facts for a
+    perturbed re-scoring without a second, drifting copy of this logic.
+    """
+    has_boundary_violation = bool(boundary_check and boundary_check.blocked)
+    has_critical_missing_data = (
+        weather is None
+        or marine is None
+        or boundary_check is None
+        or risk_suitability is None
+        or risk_suitability.status == "insufficient_data"
+    )
+    confidence = risk_suitability.confidence if risk_suitability and risk_suitability.status == "ok" else 0.0
+    # architecture.md §29: no official advisory ingestion exists yet — always
+    # False, an honest, documented scope limitation, never a fabricated
+    # "no hazard" claim about a data source that was never actually checked.
+    has_active_high_severity_advisory = False
+
+    return SafetyFacts(
+        has_boundary_violation=has_boundary_violation,
+        has_critical_missing_data=has_critical_missing_data,
+        confidence=confidence,
+        has_active_high_severity_advisory=has_active_high_severity_advisory,
+    )
 
 
 def evaluate_safety_guard(facts: SafetyFacts, *, min_confidence_threshold: float) -> SafetyGuardResult:

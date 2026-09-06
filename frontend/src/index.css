@@ -1,3 +1,100 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-sans;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  ::selection {
+    background-color: rgb(67 140 125 / 0.35); /* orca-teal */
+  }
+}
+
+/* Subtle staggered entrance for the hero's badge/heading/description/CTA —
+   a single short keyframe, staggered per element via inline animation-delay,
+   never applied when prefers-reduced-motion is set (see usePrefersReducedMotion
+   usage at each call site, which renders the settled state directly instead). */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Route Planner's real MapLibre map (src/components/map/RouteMap.tsx) uses
+   OpenStreetMap's own free, no-API-key tile server — its default
+   cartography is light, not the deep-marine dark theme the rest of the
+   app uses. This is the standard invert+hue-rotate technique for
+   approximating a dark map from a light raster source, scoped to
+   MapLibre's own canvas element only (never .maplibregl-marker or other
+   overlay elements, which are separate DOM nodes layered on top of the
+   canvas, not affected by a filter placed on the canvas itself) — so
+   marker/route-line colors stay their real, undistorted values. */
+.orca-map-dark-tiles .maplibregl-canvas {
+  filter: invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9);
+}
+
+/* Phase 8 — the /dashboard grid. A single source of DOM/visual order that
+   satisfies BOTH the mobile reading order (Header, Safety, Current
+   Conditions, Map, Fishing, Temporal, Route, Evidence — task §35) and the
+   desktop map-first layout (Header, Current Conditions, Map+Safety side by
+   side, Temporal, Fishing+Route side by side, Evidence — task §14) without
+   rendering any section twice. Named grid-template-areas per breakpoint,
+   not Tailwind's arbitrary-value syntax (fragile to get right for a
+   multi-row template) and not duplicated JSX (would desync state). */
+.orca-dashboard-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "header"
+    "safety"
+    "current"
+    "map"
+    "fishing"
+    "temporal"
+    "route"
+    "evidence";
+}
+
+@media (min-width: 1024px) {
+  .orca-dashboard-grid {
+    grid-template-columns: minmax(0, 1fr) 380px;
+    grid-template-areas:
+      "header header"
+      "current current"
+      "map safety"
+      "temporal temporal"
+      "fishing route"
+      "evidence evidence";
+  }
+}
+
+.orca-dashboard-area-header { grid-area: header; }
+.orca-dashboard-area-safety { grid-area: safety; }
+.orca-dashboard-area-current { grid-area: current; }
+.orca-dashboard-area-map { grid-area: map; }
+.orca-dashboard-area-fishing { grid-area: fishing; }
+.orca-dashboard-area-temporal { grid-area: temporal; }
+.orca-dashboard-area-route { grid-area: route; }
+.orca-dashboard-area-evidence { grid-area: evidence; }

@@ -31,3 +31,12 @@ cost_weights:
   environmental_risk: 5.0
   hazard: 5.0
   geofence_soft: 3.0
+  # Phase 5 — Advanced Marine Routing: a SOFT per-cell penalty used only by
+  # app.routing.alternatives when generating a 2nd/3rd distinct route. A
+  # cell used by an already-found route becomes this many "cost-km" more
+  # expensive per km traveled through it — large enough to reliably push A*
+  # toward a genuinely different corridor, never large enough to make reuse
+  # of that cell literally impossible (only a hard geofence does that). For
+  # ordinary single-route requests this weight is never exercised (every
+  # cell's alternative_penalty defaults to 0.0).
+  alternative_penalty: 8.0

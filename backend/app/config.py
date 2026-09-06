@@ -32,7 +32,7 @@ class Settings(BaseSettings):
     # Open-Meteo — architecture.md §14, primary live sources, no API key required.
     open_meteo_weather_base_url: str = "https://api.open-meteo.com/v1/forecast"
     open_meteo_marine_base_url: str = "https://marine-api.open-meteo.com/v1/marine"
-    http_timeout_seconds: float = 6.0  # matches architecture.md §11b's 6s data-agent timeout
+    http_timeout_seconds: float = 6.0  # matches architecture.md §11b's 6s data-agent timeout default
 
     # Max staleness before the Temporal Validity Gate marks data STALE —
     # architecture.md §16's fallback table: 30 min for wind/weather and

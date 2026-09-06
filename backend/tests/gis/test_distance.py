@@ -2,7 +2,7 @@ import pytest
 from shapely.geometry import Polygon
 
 from app.fabric.spatial import InvalidCoordinateError
-from app.gis.distance import distance_to_polygon_km, haversine_km
+from app.gis.distance import distance_to_polygon_km, haversine_km, offset_point_km
 
 # Known reference distance: London (51.5074, -0.1278) to Paris (48.8566, 2.3522)
 # is commonly cited as ~344 km great-circle.
@@ -57,3 +57,38 @@ def test_point_outside_polygon_has_positive_distance() -> None:
 def test_distance_to_polygon_rejects_empty_geometry() -> None:
     with pytest.raises(ValueError):
         distance_to_polygon_km(12.0, 74.0, Polygon())
+
+
+def test_offset_west_km_decreases_longitude() -> None:
+    lat, lon = 12.9, 74.85
+    new_lat, new_lon = offset_point_km(lat, lon, west_km=20)
+    assert new_lat == pytest.approx(lat, abs=1e-9)
+    assert new_lon < lon
+
+
+def test_offset_north_km_increases_latitude() -> None:
+    lat, lon = 12.9, 74.85
+    new_lat, new_lon = offset_point_km(lat, lon, north_km=10)
+    assert new_lat > lat
+    assert new_lon == pytest.approx(lon, abs=1e-9)
+
+
+def test_offset_zero_is_a_no_op() -> None:
+    lat, lon = 12.9, 74.85
+    new_lat, new_lon = offset_point_km(lat, lon)
+    assert new_lat == pytest.approx(lat, abs=1e-9)
+    assert new_lon == pytest.approx(lon, abs=1e-9)
+
+
+def test_offset_west_km_round_trips_through_haversine_approximately() -> None:
+    # 20km due west at this latitude should measure close to 20km via the
+    # independent haversine formula — cross-checks the equirectangular
+    # approximation against a different (great-circle) calculation.
+    lat, lon = 12.9, 74.85
+    new_lat, new_lon = offset_point_km(lat, lon, west_km=20)
+    assert haversine_km(lat, lon, new_lat, new_lon) == pytest.approx(20, rel=0.05)
+
+
+def test_offset_rejects_invalid_input_coordinates() -> None:
+    with pytest.raises(InvalidCoordinateError):
+        offset_point_km(999.0, 74.85, west_km=10)

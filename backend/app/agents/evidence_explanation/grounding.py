@@ -19,7 +19,21 @@ _NUMERIC_TOKEN_RE = re.compile(r"-?\d+\.?\d*")
 # safety net on top of the deterministic decision/safety outcomes (which
 # remain authoritative regardless), not a claim of perfect NLP
 # safety-claim detection.
+#
+# Phase 6 finding (task §8/§38): this list was English-only through
+# Phase 5. Since `EvidenceExplanationAgent.explain()` is asked to respond
+# in the detected/requested language (`app.i18n.languages
+# .SUPPORTED_LANGUAGES` = en/hi/kn), a Kannada or Hindi explanation for a
+# NO_SAFE_RECOMMENDATION decision could contain a false "it is safe"
+# affirmation that this check would never catch — a real, language-
+# specific gap, not a hypothetical one. Extended with the direct Hindi/
+# Kannada equivalents of the same handful of phrases — the SAME heuristic
+# safety-net role, still never a claim of complete multilingual NLP
+# coverage, and still never the actual safety authority (the deterministic
+# Decision Engine's NO_SAFE_RECOMMENDATION outcome is authoritative
+# regardless of whether this text check catches every possible phrasing).
 _UNSAFE_AFFIRMATION_PHRASES = (
+    # English
     "is safe",
     "safe to",
     "go ahead",
@@ -28,6 +42,21 @@ _UNSAFE_AFFIRMATION_PHRASES = (
     "we recommend",
     "safe conditions",
     "proceed with",
+    # Hindi (Devanagari) — "is safe", "you can go", "proceed" — kept as
+    # multi-word phrases (not the bare stems "सुरक्षित"/"अनुशंसित" alone),
+    # the same way the English list uses "is safe"/"safe to" rather than
+    # the bare word "safe" — a bare stem would also match its own negation
+    # ("सुरक्षित नहीं" = "NOT safe"), which must never be flagged.
+    "सुरक्षित है",
+    "सुरक्षित हैं",
+    "जा सकते हैं",
+    "आगे बढ़ें",
+    # Kannada — "is safe", "you can fish/proceed" — same multi-word
+    # discipline as above (never the bare stem "ಸುರಕ್ಷಿತ", which also
+    # matches its own negation "ಸುರಕ್ಷಿತವಲ್ಲ" = "NOT safe").
+    "ಸುರಕ್ಷಿತವಾಗಿದೆ",
+    "ಮೀನುಗಾರಿಕೆ ಮಾಡಬಹುದು",
+    "ಮುಂದುವರಿಸಬಹುದು",
 )
 
 

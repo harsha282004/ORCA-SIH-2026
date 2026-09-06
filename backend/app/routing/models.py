@@ -14,8 +14,12 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, model_validator
 
+from app.decision.models import Decision
 from app.fabric.spatial import InvalidCoordinateError, validate_point
+from app.hazard.models import Hazard
 from app.models.contracts import Mode, TemporalValidityStatus
+from app.policy.models import SafetyGuardResult
+from app.risk.engine import RiskLevel
 
 RouteErrorCode = Literal[
     "INVALID_COORDINATES",
@@ -54,6 +58,12 @@ class RouteRequest(BaseModel):
     origin: Coordinate
     destination: Coordinate
     requested_time: datetime | None = None
+    # Phase 5 (task §12) — 1 (default) reproduces Phase 3/4's exact
+    # single-route response; >1 additionally runs
+    # `app.routing.alternatives.generate_route_alternatives` (bounded, see
+    # that module's own docstring for why this is never "hundreds of
+    # routes"). Never negative/zero — validated below.
+    max_alternatives: int = Field(default=1, ge=1, le=5)
 
 
 class RouteValidationIssue(BaseModel):
@@ -85,6 +95,11 @@ class RouteMetrics(BaseModel):
     environmental_risk_cost: float
     hazard_cost: float
     geofence_cost: float
+    # Phase 5 — always 0.0 unless this route was generated via
+    # app.routing.alternatives as a deliberately-diverse 2nd/3rd option (see
+    # app.routing.costs' module docstring). Exposed so a route's total_cost
+    # is always fully explained by its own breakdown, never a silent gap.
+    alternative_penalty_cost: float = 0.0
     total_cost: float
     cell_count: int
     average_risk_score: float | None
@@ -121,3 +136,36 @@ class RouteResult(BaseModel):
             "type": "LineString",
             "coordinates": [[c.longitude, c.latitude] for c in self.path_coordinates],
         }
+
+
+class RankedRoute(BaseModel):
+    """Phase 5 (task §12/§13/§14) — one alternative, fully evaluated
+    through the SAME deterministic pipeline every route goes through:
+    `calculate_route` -> `hazards_near_route` -> `app.routing.safety
+    .evaluate_route_safety`. `label` ("A"/"B"/"C", assigned in the order
+    routes were generated — the primary/optimal route is always "A") is
+    presentation-only; it carries no ranking meaning by itself, only
+    `RouteComparisonResult.recommended_label` does.
+    """
+
+    label: str
+    route: RouteResult
+    risk_level: RiskLevel
+    decision: Decision
+    safety: SafetyGuardResult
+    hazards_near_route: list[Hazard]
+    hazard_source_tier: Literal["live", "cached", "unavailable"]
+
+
+class RouteComparisonResult(BaseModel):
+    """Deterministic comparison output (task §14) — `recommended_label` is
+    computed by `app.routing.comparison.compare_routes`, never by an LLM;
+    `reason` is a template string built from the same real numbers shown in
+    `routes`, not a natural-language generation (Groq may re-phrase this
+    for a conversational answer, but never invent or override it).
+    """
+
+    routes: list[RankedRoute]
+    recommended_label: str | None
+    reason: str
+    generated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

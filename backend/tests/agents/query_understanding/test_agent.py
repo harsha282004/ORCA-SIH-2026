@@ -100,3 +100,42 @@ def test_location_and_time_window_are_never_copied_verbatim_from_the_llm() -> No
     # (location.py / time_resolution.py), never raw LLM string fields.
     assert isinstance(result.location, dict) and "resolved_bbox" in result.location
     assert isinstance(result.time_window, dict) and "start" in result.time_window and "end" in result.time_window
+
+
+def test_route_planning_with_two_named_places_resolves_both_location_and_destination() -> None:
+    agent = QueryUnderstandingAgent(
+        llm_provider=FakeLLMProvider(
+            structured_response=_raw(intent_class="route_planning", location_name="Mangaluru", destination_name="Udupi", requires_route=True)
+        )
+    )
+    result = agent.understand(query="Plan a route from Mangaluru to Udupi", now=NOW, demo_bbox=DEMO_BBOX)
+    assert isinstance(result, IntentResult)
+    assert result.location["name"] == "Mangaluru"
+    assert result.destination is not None
+    assert result.destination["name"] == "Udupi"
+    assert result.destination["resolved_bbox"] != result.location["resolved_bbox"]
+
+
+def test_route_planning_without_a_destination_name_leaves_destination_none() -> None:
+    agent = QueryUnderstandingAgent(llm_provider=FakeLLMProvider(structured_response=_raw(intent_class="route_planning", requires_route=True)))
+    result = agent.understand(query="Plan a route near Mangaluru", now=NOW, demo_bbox=DEMO_BBOX)
+    assert isinstance(result, IntentResult)
+    assert result.destination is None
+
+
+def test_unrecognized_destination_name_returns_clarification_not_a_guess() -> None:
+    agent = QueryUnderstandingAgent(
+        llm_provider=FakeLLMProvider(
+            structured_response=_raw(intent_class="route_planning", location_name="Mangaluru", destination_name="Atlantis", requires_route=True)
+        )
+    )
+    result = agent.understand(query="Plan a route from Mangaluru to Atlantis", now=NOW, demo_bbox=DEMO_BBOX)
+    assert isinstance(result, ClarificationNeeded)
+    assert "destination" in result.missing_fields
+
+
+def test_non_routing_intent_never_populates_destination() -> None:
+    agent = QueryUnderstandingAgent(llm_provider=FakeLLMProvider(structured_response=_raw()))
+    result = agent.understand(query="Is it safe to fish near Mangaluru?", now=NOW, demo_bbox=DEMO_BBOX)
+    assert isinstance(result, IntentResult)
+    assert result.destination is None

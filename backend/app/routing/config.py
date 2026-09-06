@@ -46,6 +46,12 @@ class RoutingCostWeights(BaseModel):
     environmental_risk: float
     hazard: float
     geofence_soft: float
+    # Phase 5 — see app.routing.grid.RoutingNode.alternative_penalty and
+    # app.routing.costs' module docstring for the exact formula. Defaults to
+    # 0.0 so every pre-Phase-5 construction of this model (many exist across
+    # tests and routing_config.yaml) is unaffected; only
+    # app.routing.alternatives ever sets a nonzero per-cell penalty.
+    alternative_penalty: float = 0.0
 
     @model_validator(mode="after")
     def _non_negative(self) -> "RoutingCostWeights":

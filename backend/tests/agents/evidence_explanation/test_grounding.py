@@ -43,3 +43,33 @@ def test_is_grounded_and_safe_requires_both_checks_to_pass() -> None:
     assert is_grounded_and_safe("risk score is 0.27", [0.27], decision_outcome="RECOMMEND") is True
     assert is_grounded_and_safe("risk score is 0.99", [0.27], decision_outcome="RECOMMEND") is False
     assert is_grounded_and_safe("it is safe", [], decision_outcome="NO_SAFE_RECOMMENDATION") is False
+
+
+# --- Phase 6: the same false-safety-claim check must also work in Hindi/Kannada ---
+
+
+def test_no_false_safety_claim_fails_on_hindi_unsafe_affirmation() -> None:
+    text = "आज मछली पकड़ने के लिए स्थिति सुरक्षित है, आप जा सकते हैं।"
+    assert check_no_false_safety_claim(text, decision_outcome="NO_SAFE_RECOMMENDATION") is False
+
+
+def test_no_false_safety_claim_fails_on_kannada_unsafe_affirmation() -> None:
+    text = "ಈ ಪ್ರದೇಶ ಸುರಕ್ಷಿತವಾಗಿದೆ, ನೀವು ಮೀನುಗಾರಿಕೆ ಮಾಡಬಹುದು."
+    assert check_no_false_safety_claim(text, decision_outcome="NO_SAFE_RECOMMENDATION") is False
+
+
+def test_no_false_safety_claim_passes_for_hindi_text_with_no_safety_claim() -> None:
+    text = "जोखिम अधिक है, इसलिए ORCA अभी कोई सिफारिश नहीं कर सकता।"
+    assert check_no_false_safety_claim(text, decision_outcome="NO_SAFE_RECOMMENDATION") is True
+
+
+def test_no_false_safety_claim_passes_for_kannada_text_with_no_safety_claim() -> None:
+    text = "ಅಪಾಯ ಹೆಚ್ಚಿದೆ, ಆದ್ದರಿಂದ ORCA ಈಗ ಯಾವುದೇ ಸಲಹೆ ನೀಡಲು ಸಾಧ್ಯವಿಲ್ಲ."
+    assert check_no_false_safety_claim(text, decision_outcome="NO_SAFE_RECOMMENDATION") is True
+
+
+def test_hindi_kannada_safety_claims_pass_when_decision_is_not_blocked() -> None:
+    # The check only applies when the decision is NO_SAFE_RECOMMENDATION —
+    # a legitimate "it is safe" claim in a RECOMMEND response is fine.
+    assert check_no_false_safety_claim("यह सुरक्षित है", decision_outcome="RECOMMEND") is True
+    assert check_no_false_safety_claim("ಇದು ಸುರಕ್ಷಿತವಾಗಿದೆ", decision_outcome="RECOMMEND") is True

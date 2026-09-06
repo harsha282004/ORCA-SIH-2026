@@ -82,10 +82,11 @@ invented on its own.
 
 ---
 
-## Current status: Phase 5 — LangGraph Orchestration
+## Current status: Phase 11 — Integration, QA & Demo Hardening
 
-This repository currently implements **Phase 0 (Infrastructure)** through **Phase 5
-(LangGraph Orchestration)** of the development roadmap (architecture §44).
+This repository currently implements **Phase 0 (Infrastructure)** through **Phase 11
+(Full Integration, QA, Reliability & Demo Hardening)** of the development roadmap
+(architecture §44).
 
 **Implemented in Phase 0:** FastAPI + PostgreSQL/PostGIS + Redis + React/TS/Tailwind
 infrastructure, Docker Compose, real health/readiness checks.
@@ -164,18 +165,61 @@ Full detail: [`docs/data_agents.md`](docs/data_agents.md).
 
 Full detail: [`docs/orchestration.md`](docs/orchestration.md).
 
-**Explicitly NOT implemented yet** (belongs to later phases):
-Route computation from a conversational query (no vessel-origin concept exists yet —
-`POST /api/v1/route` remains the only way to compute an actual route). Official-advisory
-ingestion, evidence arbitration/conflict resolution across multiple sources, and
-alternative-site search. The Alert Engine, the Scenario Engine, and the full map/
-visualization interface. Static GIS datasets (coastline, bathymetry, protected areas,
-EEZ) have not been acquired yet — the `DEMO_BBOX` they'd be clipped to is still a
-proposal pending confirmation, so every geofence used remains a labeled fixture, not
-real data. `routes`/`route_segments` persistence (architecture §33) remains deliberately
-unimplemented — see `docs/routing.md` §13 for why. The corresponding backend directories
-for later-phase components (`alerts/`, `scenario/`) exist (per the architecture's frozen
-repository structure, §42) but are intentionally empty.
+**Implemented in Phase 6:** the two-clip scroll-controlled cinematic hero
+(`frontend/src/components/cinematic/`, `public/videos/clip1.mp4`+`clip2.mp4`), the ORCA
+coastal visual theme, and the full marketing/application frontend (`Ask ORCA`,
+`Route Planner`, `Status` pages) wired to the real backend — no mock data anywhere in
+the UI.
+
+**Implemented in Phase 7-9:** these phases' architecture-named components (LLM Provider
+Abstraction, Query Understanding, LangGraph orchestration, the Decision Provenance Graph,
+Evidence & Explanation grounding) were found, on audit, already substantially built under
+Phase 5 — nothing was rebuilt. The two genuine gaps closed: multi-turn
+`refers_to_prior`/`reference_type` are now actually acted on deterministically (see
+Phase 10 below), and `GET /api/v1/query/{query_id}/provenance` (architecture §34) now
+exists as a standalone endpoint (`backend/app/provenance/store.py`).
+
+**Implemented in Phase 10:**
+- Multi-turn reference resolution (architecture §31a) —
+  `backend/app/agents/query_understanding/reference.py` deterministically resolves a
+  follow-up ("what about 20 km farther offshore?") against the prior turn's already-
+  resolved location; the LLM only ever supplies the structured reference, never a
+  coordinate
+- The Scenario Engine (architecture §32, `POST /api/v1/scenario`,
+  `backend/app/scenario/`) — reuses the live pipeline's exact risk/safety/decision
+  functions on a perturbed copy of the prior turn's environmental baseline, labeled
+  `"SIMULATION — NOT LIVE DATA"`, never overwriting the real session state
+- The Alert Engine (architecture §29, `GET /api/v1/alerts`, `backend/app/alerts/`) —
+  5 of 7 named hazard types (cyclone proxy and route-entering-a-prohibited-zone are
+  honestly not computable/applicable here — see `docs/phase_10.md` §4), New/Updated/
+  Escalated/Resolved dedup via a Redis-backed store
+- Route comparison was deliberately **not** built — architecture §41 classifies it
+  SHOULD/STRETCH, below every MUST-HAVE item, and the existing single-route
+  `POST /api/v1/route` already supports comparison via repeated calls
+
+Full detail: [`docs/phase_10.md`](docs/phase_10.md).
+
+**Implemented in Phase 11 (QA & hardening, no new features):** three real, reproducible
+defects were found via genuine live-service testing (not just the offline unit suite) and
+fixed at their smallest necessary component: an opaque unstructured 500 on a missing LLM
+provider config now returns a structured `503 {code, message}`; Open-Meteo Marine's own
+rate limit (HTTP 429 under `POST /api/v1/route`'s 16-way concurrent sample fetch) is now
+handled by a single retry-with-backoff (reusing the existing `app.llm.provider` retry
+primitive, architecture §38's general policy — not a second implementation); and the
+backend's CORS policy now permits any `localhost` port, since Vite silently falls back to
+an alternate port whenever its default is already taken, which previously broke the
+frontend with a misleading "backend not reachable" message. See `docs/phase_11.md` for
+the full QA report.
+
+**Still not implemented** (genuinely out of scope, not silently dropped): official-
+advisory ingestion, evidence arbitration/conflict resolution across multiple sources
+(only one source exists per domain — nothing to arbitrate yet), alternative-site search,
+route computation from a conversational query (no vessel-origin concept exists — `POST
+/api/v1/route` remains the only way to compute an actual route), and real static GIS
+datasets (coastline, bathymetry, protected areas, EEZ) — the `DEMO_BBOX` they'd be
+clipped to is still a proposal pending confirmation, so every geofence used remains a
+labeled fixture, not real data. `routes`/`route_segments` persistence (architecture §33)
+remains deliberately unimplemented — see `docs/routing.md` §13 for why.
 
 ---
 
@@ -319,17 +363,17 @@ Matches the architecture's frozen repository structure (§42). See
 `backend/app/data/`, `backend/app/fabric/`, `backend/app/models/` (Phase 1),
 `backend/app/gis/`, `backend/app/risk/`, `backend/app/reasoning/`,
 `backend/app/suitability/`, `backend/app/policy/`, `backend/app/decision/` (Phase 2),
-`backend/app/routing/` (Phase 3), `backend/app/agents/` (Phase 4), and
+`backend/app/routing/` (Phase 3), `backend/app/agents/` (Phase 4),
 `backend/app/llm/`, `backend/app/orchestration/`, `backend/app/provenance/`,
-`backend/app/i18n/`, `backend/app/session/` (Phase 5) are now implemented. Directories
-still empty (`alerts/`, `scenario/`) are reserved for later phases and contain only a
-`.gitkeep`.
+`backend/app/i18n/`, `backend/app/session/` (Phase 5), and `backend/app/alerts/`,
+`backend/app/scenario/` (Phase 10) are all implemented — no backend directory in the
+architecture's frozen structure is still an empty placeholder.
 
 ---
 
-## Future phases
+## Development history
 
-Development proceeds strictly in order, with validation between each phase
+Development proceeded strictly in order, with validation between each phase
 (architecture §44):
 
 1. ~~**Phase 0 — Infrastructure**~~ (complete)
@@ -344,11 +388,15 @@ Development proceeds strictly in order, with validation between each phase
 6. ~~**Phase 5 — LangGraph orchestration**~~ (full agent graph, LLM Provider Abstraction
    Layer, language detection, multi-turn session state, `POST /api/v1/query`; see
    `docs/orchestration.md`)
-7. **Phase 6 — Evidence, provenance, explanation hardening**: multi-source evidence
-   arbitration/conflict resolution, official-advisory ingestion, alternative-site search
-8. **Phase 7 — Frontend/map**: risk heatmap, evidence/provenance panels, Agent Activity
-   panel
-9. **Phase 8 — Fallback, testing, demo hardening**
+7. ~~**Phase 6 — Cinematic frontend & full UI**~~ (two-clip cinematic hero, coastal
+   theme, Ask ORCA / Route Planner / Status pages, all wired to the real backend)
+8. ~~**Phase 7-9 — LLM abstraction extension, provenance, explanation**~~ (audited
+   already-complete under Phase 5; standalone provenance retrieval added)
+9. ~~**Phase 10 — Advanced capabilities**~~ (multi-turn reference resolution, Scenario
+   Engine, Alert Engine; route comparison deliberately deferred — see `docs/phase_10.md`)
+10. ~~**Phase 11 — Integration, QA & demo hardening**~~ (no new features; three real
+    reliability defects found via live-service testing and fixed — see `docs/phase_11.md`)
 
-No phase begins before the previous one is validated. This repository does not implement
-Phase 6 or later — that is deliberate.
+No phase began before the previous one was validated. **Phase 12 (deployment) has
+deliberately not been started** — this repository runs locally only; no production
+infrastructure, domain, or cloud hosting has been configured.

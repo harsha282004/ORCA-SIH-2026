@@ -82,7 +82,7 @@ class WeatherIntelligenceAgent:
                     expected_parameter_count=len(REQUIRED_HOURLY_PARAMETERS),
                     source_tier_override="synthetic",
                     status="degraded",
-                    warnings=["DEMO DATA / SIMULATION — NOT LIVE DATA: live and cached weather unavailable"],
+                    warnings=[f"DEMO DATA / SIMULATION — NOT LIVE DATA: live and cached weather unavailable ({exc})"],
                 )
             # architecture.md §16a: LIVE mode must never fall through to
             # synthetic data — a structured failure, not a fabricated result.

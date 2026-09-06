@@ -137,6 +137,41 @@ def test_llm_cannot_make_the_decision_engine_recommend_a_blocked_query() -> None
     assert "is safe" not in final.explanation.rationale.lower()
 
 
+def test_dangerous_wave_height_is_detected_as_a_hazard_and_blocks_via_safety_guard() -> None:
+    """Phase 4: `safety_guard` now runs `app.hazard.engine.detect_all_hazards`
+    for every intent that reaches it — a wave reading at/above the Risk
+    Engine's own WAVE_SATURATION_M must be surfaced as a real HIGH_WAVES
+    Hazard AND correctly flip the previously-always-False
+    `has_active_high_severity_advisory` fact, forcing BLOCK_HAZARD/
+    NO_SAFE_RECOMMENDATION — even though the raw risk SCORE alone (LOW
+    confidence penalty aside) might not by itself have crossed the HIGH
+    risk-level threshold.
+    """
+    nodes = build_nodes(
+        weather_result=make_weather_result(wind_speed_10m=3.0, weathercode=0),
+        marine_result=make_marine_result(wave_height=3.6),  # above WAVE_SATURATION_M=3.0
+    )
+    final = _run(nodes)
+
+    assert final.status == "completed"
+    hazard_types = {h.hazard_type for h in final.hazards}
+    assert "HIGH_WAVES" in hazard_types
+    assert final.safety.outcome == "BLOCK_HAZARD"
+    assert final.decision.outcome == "NO_SAFE_RECOMMENDATION"
+
+
+def test_calm_conditions_produce_no_hazards_and_pass_normally() -> None:
+    nodes = build_nodes(
+        weather_result=make_weather_result(wind_speed_10m=3.0, weathercode=0),
+        marine_result=make_marine_result(wave_height=0.5),
+    )
+    final = _run(nodes)
+
+    assert final.hazards == []
+    assert final.safety.outcome == "PASS"
+    assert final.decision.outcome == "RECOMMEND"
+
+
 def test_repeated_invocation_with_identical_inputs_is_deterministic() -> None:
     nodes = build_nodes(
         weather_result=make_weather_result(wind_speed_10m=3.0, weathercode=0),

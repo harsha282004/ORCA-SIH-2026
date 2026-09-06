@@ -56,6 +56,16 @@ services:
       MARINE_MAX_STALENESS_MINUTES: ${MARINE_MAX_STALENESS_MINUTES:-30}
     ports:
       - "8000:8000"
+    volumes:
+      # Phase 1 (Marine Data Foundation): the repo's top-level data/raw and
+      # data/processed directories (architecture.md §42, `Settings
+      # .data_raw_dir`'s own "relative to cwd" convention) were never
+      # actually reachable from inside the container before this — the
+      # backend image's build context is ./backend only. Mounted here so
+      # acquired datasets (GEBCO, INCOIS) persist across rebuilds and are
+      # readable by both the acquisition scripts and the running API from
+      # the SAME physical files the host repository tracks.
+      - ./data:/app/data
     depends_on:
       postgres:
         condition: service_healthy

@@ -1,0 +1,59 @@
+{
+  "generated_at": "2026-09-06T11:00:28.726054+00:00",
+  "demo_bbox": {
+    "min_lat": 12.7,
+    "min_lon": 73.5,
+    "max_lat": 13.45,
+    "max_lon": 75.05
+  },
+  "datasets": {
+    "gebco_bathymetry": {
+      "status": "acquired",
+      "raw_path": "data/raw/gebco/gebco_2026_depth_samples_20260906T110028Z.json",
+      "raw_size_bytes": 40879,
+      "raw_checksum_sha256": "e038280de79a97a80f02d39887689b05ee5fdca3a60d80ec27b598330051d18d",
+      "reference_png_path": "data/raw/gebco/gebco_2026_reference_map_20260906T110028Z.png",
+      "reference_png_size_bytes": 56986,
+      "reference_png_checksum_sha256": "819161c0e6a8e26124a575f7fffee1f92e126bb2629d0f49601f6bc1e3df8582",
+      "processed_path": "data/processed/gebco_bathymetry_orca_bbox.geojson",
+      "processed_size_bytes": 57767,
+      "processed_checksum_sha256": "73c60f710aa99b2f827c4f5dbd431383cffe5155c23dbfec82a08456aaf5e717",
+      "sample_count_requested": 225,
+      "sample_count_with_value": 225,
+      "depth_min_m": -1795.0,
+      "depth_max_m": 153.0
+    },
+    "incois_chl": {
+      "status": "acquired",
+      "raw_path": "data/raw/incois/incois_chl_samples_20260906T110028Z.json",
+      "raw_size_bytes": 12127,
+      "raw_checksum_sha256": "3564a27e2350981e7d8a150d80e1141826f41dad61c861892f253ae8d3e3b2f3",
+      "reference_png_path": "data/raw/incois/incois_chl_reference_map_20260906T110028Z.png",
+      "reference_png_size_bytes": 110091,
+      "reference_png_checksum_sha256": "35bd906c662f3edfc1e028ba7e441937481fdd38b244ff0169b2d23e9c829338",
+      "processed_path": "data/processed/incois_chl_orca_bbox.geojson",
+      "processed_size_bytes": 15871,
+      "processed_checksum_sha256": "3ff6557349958214008945428cdbbbc1e3a279369d4f168edb44849673269d4d",
+      "sample_count_requested": 64,
+      "sample_count_with_value": 51,
+      "value_min": 0.13954342901706696,
+      "value_max": 7.379112243652344
+    },
+    "incois_sst": {
+      "status": "acquired",
+      "raw_path": "data/raw/incois/incois_sst_samples_20260906T110028Z.json",
+      "raw_size_bytes": 12009,
+      "raw_checksum_sha256": "de18270a1feffa2819894a2d617a1885f0ec4a08c7ff772fa535d19b079a2c6a",
+      "reference_png_path": "data/raw/incois/incois_sst_reference_map_20260906T110028Z.png",
+      "reference_png_size_bytes": 32514,
+      "reference_png_checksum_sha256": "b2a28f2eca3b3555fd4b00fb06da2ed62415a6fc716b4946837eb3349f5b12d2",
+      "processed_path": "data/processed/incois_sst_orca_bbox.geojson",
+      "processed_size_bytes": 17167,
+      "processed_checksum_sha256": "edd687b07f9dcda186398d0d6de0b280194421f3a1cd9b7610a8c6c86a221513",
+      "sample_count_requested": 64,
+      "sample_count_with_value": 56,
+      "value_min": 29.6300048828125,
+      "value_max": 31.862844467163086
+    }
+  }
+}

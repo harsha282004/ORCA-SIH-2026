@@ -33,6 +33,30 @@ def haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     return EARTH_RADIUS_KM * c
 
 
+def offset_point_km(latitude: float, longitude: float, *, north_km: float = 0.0, west_km: float = 0.0) -> tuple[float, float]:
+    """Returns a new (latitude, longitude) shifted from the given point by
+    `north_km`/`west_km` (either may be negative for south/east). Used by
+    architecture.md §31a's deterministic reference-resolution step (e.g.
+    "20 km farther offshore") — the LLM only ever supplies the structured
+    *distance*; this function performs the actual coordinate math so no
+    LLM-invented coordinate ever enters the pipeline.
+
+    Same equirectangular-projection approximation already used by
+    `distance_to_polygon_km` (accurate to ~1% at the demo bbox's scale) —
+    an engineering approximation, not a navigation-grade geodesic
+    calculation, and documented as such everywhere it is used.
+    """
+    validate_point(latitude, longitude)
+    km_per_deg_lat = 111.32
+    km_per_deg_lon = 111.32 * math.cos(math.radians(latitude))
+    if km_per_deg_lon <= 0:
+        raise ValueError(f"cannot offset at latitude {latitude} (too close to the pole)")
+
+    new_latitude = latitude + (north_km / km_per_deg_lat)
+    new_longitude = longitude - (west_km / km_per_deg_lon)
+    return new_latitude, new_longitude
+
+
 def distance_to_polygon_km(latitude: float, longitude: float, polygon: Polygon) -> float:
     """Approximate distance from a point to the nearest edge of a polygon, in
     kilometers. 0.0 if the point is inside or on the boundary.

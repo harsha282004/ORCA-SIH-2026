@@ -61,6 +61,28 @@ class RouteProvenance(BaseModel):
     avoided_hazard_cells: int = 0
 
 
+class ScenarioProvenance(BaseModel):
+    """Phase 7 (task §29/§30) — the ONE new provenance concept this phase
+    adds, mirroring `RouteProvenance`'s existing sibling-field pattern
+    (never a second output schema for "simulated" results, per
+    `app.scenario.models`' own docstring). Carries BOTH sides of a
+    baseline-vs-scenario diff so the Evidence Agent can reference real
+    numbers on either side without inventing anything — and so a reader of
+    the raw provenance graph can never mistake `scenario_value` for an
+    actual Open-Meteo observation.
+    """
+
+    label: str = "SIMULATION — NOT LIVE DATA"
+    variable: str  # "wave_height_m" | "wind_speed_ms" — matches app.scenario.models.ScenarioPerturbation's fields
+    unit: str
+    baseline_value: float  # the REAL observed/forecast value this scenario started from
+    scenario_value: float  # the USER-ASSUMED value — never presented as a forecast
+    baseline_risk_score: float
+    scenario_risk_score: float
+    baseline_decision_outcome: str
+    scenario_decision_outcome: str
+
+
 class DecisionProvenanceGraph(BaseModel):
     query_id: str
     risk: RiskProvenance | None = None
@@ -69,6 +91,7 @@ class DecisionProvenanceGraph(BaseModel):
     conflicts: list[ConflictObject] = Field(default_factory=list)
     safety: SafetyGuardResult | None = None
     route: RouteProvenance | None = None
+    scenario: ScenarioProvenance | None = None
     decision: Decision | None = None
     generated_at: datetime
 

@@ -74,6 +74,29 @@ class FakeOceanographicAgent:
         return self._result
 
 
+class FakeHazardCache:
+    """Phase 4: an in-memory, network-free stand-in for `AgentCache`, pre-
+    seeded with an EMPTY cyclone list so `safety_guard`'s hazard detection
+    (`app.hazard.engine.detect_all_hazards`) never attempts a live GDACS
+    request in this offline test package — matches this module's own
+    documented "no real network" contract. Weather/wave/wind hazard
+    detection is local and pure, so it is genuinely exercised either way.
+    """
+
+    def __init__(self, seed: dict | None = None):
+        from app.hazard.cyclone import CYCLONE_CACHE_KEY
+
+        self._store: dict = {CYCLONE_CACHE_KEY: []}
+        if seed:
+            self._store.update(seed)
+
+    def get_json(self, key: str):
+        return self._store.get(key)
+
+    def set_json(self, key: str, value) -> None:
+        self._store[key] = value
+
+
 def make_raw_intent(**overrides) -> RawIntentResult:
     defaults = dict(
         language="en",
@@ -98,6 +121,8 @@ def build_nodes(
     weather_result: AgentResult | None = None,
     marine_result: AgentResult | None = None,
     explanation_rationale: str = "Test explanation, grounded in nothing quantitative.",
+    environmental_provider_class=None,
+    routing_config=None,
 ) -> OrchestrationNodes:
     qu_agent = QueryUnderstandingAgent(llm_provider=FakeLLMProvider(structured_response=raw_intent or make_raw_intent()))
     evidence_agent = EvidenceExplanationAgent(
@@ -108,9 +133,12 @@ def build_nodes(
         query_understanding_agent=qu_agent,
         weather_agent=FakeWeatherAgent(weather_result),
         oceanographic_agent=FakeOceanographicAgent(marine_result),
+        environmental_provider_class=environmental_provider_class,
+        routing_config=routing_config,
         gis_agent=gis_agent,
         risk_suitability_agent=RiskSuitabilityAgent(gis_agent=gis_agent),
         evidence_agent=evidence_agent,
+        hazard_cache=FakeHazardCache(),
     )
 
 

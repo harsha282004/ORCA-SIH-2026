@@ -1,0 +1,868 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.406490325927734,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.596875,
+          12.746875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.193546295166016,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.790625,
+          12.746875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.100616455078125,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.984375,
+          12.746875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.11126708984375,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.178125,
+          12.746875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.22417449951172,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.371875,
+          12.746875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.320158004760742,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.565625,
+          12.746875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.16293716430664,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.75937499999999,
+          12.746875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.369544982910156,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.596875,
+          12.840625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.26720428466797,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.790625,
+          12.840625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.266403198242188,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.984375,
+          12.840625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 29.906593322753906,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.178125,
+          12.840625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.061511993408203,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.371875,
+          12.840625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.1207275390625,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.565625,
+          12.840625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.18538475036621,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.75937499999999,
+          12.840625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.17236328125,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.596875,
+          12.934375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 29.887943267822266,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.790625,
+          12.934375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.053585052490234,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.984375,
+          12.934375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.03914451599121,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.178125,
+          12.934375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.08970832824707,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.371875,
+          12.934375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.02863883972168,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.565625,
+          12.934375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.132722854614258,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.75937499999999,
+          12.934375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.14128875732422,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.596875,
+          13.028125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.485200881958008,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.790625,
+          13.028125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.181522369384766,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.984375,
+          13.028125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 29.960205078125,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.178125,
+          13.028125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.084163665771484,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.371875,
+          13.028125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.02842140197754,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.565625,
+          13.028125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.267080307006836,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.75937499999999,
+          13.028125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.166519165039062,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.596875,
+          13.121875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.32448387145996,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.790625,
+          13.121875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 29.818294525146484,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.984375,
+          13.121875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.10860824584961,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.178125,
+          13.121875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.02454376220703,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.371875,
+          13.121875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.04304313659668,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.565625,
+          13.121875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 31.862844467163086,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.75937499999999,
+          13.121875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.05080795288086,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.596875,
+          13.215625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 29.98036766052246,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.790625,
+          13.215625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.27051544189453,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.984375,
+          13.215625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 29.81261444091797,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.178125,
+          13.215625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 29.84942054748535,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.371875,
+          13.215625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 29.87924575805664,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.565625,
+          13.215625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 29.6300048828125,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.75937499999999,
+          13.215625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 29.945478439331055,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.596875,
+          13.309375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 29.927963256835938,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.790625,
+          13.309375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 29.959991455078125,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.984375,
+          13.309375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.10561752319336,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.178125,
+          13.309375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 29.82373046875,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.371875,
+          13.309375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 29.676761627197266,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.565625,
+          13.309375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 29.70001220703125,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.75937499999999,
+          13.309375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 29.90192413330078,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.596875,
+          13.403125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.043670654296875,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.790625,
+          13.403125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.08068084716797,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.984375,
+          13.403125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 30.240219116210938,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.178125,
+          13.403125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 29.66901397705078,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.371875,
+          13.403125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 29.719528198242188,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.565625,
+          13.403125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "value": 29.760009765625,
+        "unit": "degC",
+        "parameter": "sst"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.75937499999999,
+          13.403125
+        ]
+      }
+    }
+  ],
+  "properties": {
+    "dataset": "INCOIS Sea Surface Temperature",
+    "parameter": "sst",
+    "provider": "ESSO-INCOIS (Indian National Centre for Ocean Information Services)",
+    "source_url": "https://incois.gov.in/geoportal/MFASPFZ/index.html",
+    "access_method": "OGC WMS GetFeatureInfo, layer 'sst', https://incois.gov.in/geoserver/PFZ-TUNA-SST-CHL/wms",
+    "acquired_at": "2026-09-06T11:00:28.726054+00:00",
+    "crs": "EPSG:4326",
+    "unit": "degC",
+    "unit_confidence": "inferred from value ranges and INCOIS's published PFZ methodology \u2014 not independently confirmed via service metadata (see app.data.incois_wms module docstring)",
+    "bbox": {
+      "min_lat": 12.7,
+      "min_lon": 73.5,
+      "max_lat": 13.45,
+      "max_lon": 75.05
+    },
+    "grid_resolution": "8x8 bounded point samples",
+    "sample_count_requested": 64,
+    "sample_count_with_value": 56,
+    "temporal_semantics": "single current operational snapshot \u2014 no WMS time dimension is advertised by this service",
+    "authoritative": true,
+    "classification": "dynamic"
+  }
+}

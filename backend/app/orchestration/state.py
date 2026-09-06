@@ -27,6 +27,7 @@ from app.agents.query_understanding.models import ClarificationNeeded, IntentRes
 from app.agents.risk_suitability.models import RiskSuitabilityResult
 from app.decision.models import Decision
 from app.gis.geofence import GeofenceCheckResult
+from app.hazard.models import Hazard, HazardSourceStatus
 from app.i18n.languages import DEFAULT_LANGUAGE
 from app.models.contracts import AgentResult
 from app.policy.models import SafetyGuardResult
@@ -42,6 +43,17 @@ class OrchestrationState(BaseModel):
     query: str
     session_id: str | None = None
     now: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    # architecture.md §31a: the prior turn's ALREADY-resolved IntentResult,
+    # supplied by the API layer from SessionState.last_intent. Read-only
+    # input to the query_understanding node's reference-resolution step
+    # (app.agents.query_understanding.reference.resolve_reference) — never
+    # written by any node.
+    prior_intent: IntentResult | None = None
+    # Phase 6 (task §13/§18) — the prior turn's `SessionState
+    # .last_selected_point`, supplied by the API layer. Read-only input to
+    # `query_understanding`'s reference-resolution step, same as
+    # `prior_intent` above — never written by any node.
+    prior_selection: dict | None = None
 
     # --- Query Understanding -------------------------------------------------
     language: str = DEFAULT_LANGUAGE
@@ -50,6 +62,11 @@ class OrchestrationState(BaseModel):
     clarification: ClarificationNeeded | None = None
     latitude: float | None = None
     longitude: float | None = None
+    # Phase 5 (task §28) — populated only when `intent.destination` was
+    # resolved (a route_planning query naming two places). `None` for every
+    # other intent/query, exactly reproducing pre-Phase-5 behavior.
+    destination_latitude: float | None = None
+    destination_longitude: float | None = None
 
     # --- Parallel data-agent branch (Weather / Oceanographic / GIS) --------
     weather: AgentResult | None = None
@@ -63,9 +80,28 @@ class OrchestrationState(BaseModel):
     safety: SafetyGuardResult | None = None
     decision: Decision | None = None
 
+    # --- Hazard Intelligence (Phase 4) --------------------------------------
+    # Populated by the SAME `safety_guard` node, via `app.hazard.engine
+    # .detect_all_hazards` — every existing intent (safety_check,
+    # route_planning, diagnostic_exploration, boundary_check,
+    # zone_recommendation) benefits from real hazard-awareness through this
+    # one shared node, without a new node/edge or a duplicate intent class.
+    hazards: list[Hazard] = Field(default_factory=list)
+    hazard_unavailable_sources: list[HazardSourceStatus] = Field(default_factory=list)
+
     # --- Route (conditional) ------------------------------------------------
     route: RouteResult | None = None
     route_note: str | None = None
+    # Phase 5 (task §28) — populated only when the `route` node actually ran
+    # real routing (destination resolved). `route_hazards` is the SAME
+    # `hazards_near_route` check Phase 4/§7 already established, reused
+    # here rather than duplicated. `route_alternatives`/`route_comparison`
+    # mirror `POST /api/v1/route`'s own additive response shape (serialized
+    # dicts, not typed models, so this state module stays decoupled from
+    # `app.routing.models.RankedRoute`/`RouteComparisonResult`).
+    route_hazards: list[Hazard] = Field(default_factory=list)
+    route_alternatives: list[dict] = Field(default_factory=list)
+    route_comparison: dict | None = None
 
     # --- Evidence & Explanation ----------------------------------------------
     provenance: DecisionProvenanceGraph | None = None

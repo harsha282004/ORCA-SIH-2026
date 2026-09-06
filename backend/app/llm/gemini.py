@@ -7,8 +7,12 @@ Implemented via a direct HTTPS call to the Generative Language API's
 mechanism for schema-constrained output. No `google-generativeai` SDK
 dependency, same minimal-dependency rationale as `claude.py`.
 
-**NOT live-tested in this environment** — no `LLM_API_KEY` is configured
-here.
+Live-tested against the real Generative Language API with a genuine
+`LLM_API_KEY`/`gemini-2.5-flash` — this surfaced and fixed a real bug in
+`_strip_unsupported_keys` (see its docstring): a nested-model field
+(`RawIntentResult.reference_delta`) produces a `$ref`/`$defs` pair that
+the previous version left dangling after deleting `$defs`, which Gemini's
+API rejected outright.
 """
 from __future__ import annotations
 
@@ -95,16 +99,31 @@ class GeminiProvider(LLMProvider):
         return result.language
 
 
-def _strip_unsupported_keys(schema):
-    """Gemini's `responseSchema` accepts a restricted subset of JSON Schema
-    (no `$defs`/`title`/`additionalProperties` etc.). This is a best-effort
-    recursive pass-through; the exact accepted subset is enforced live by
-    Google's API — see the module docstring on why this is not
-    live-verifiable here.
+def _strip_unsupported_keys(schema, defs=None):
+    """Gemini's `responseSchema` accepts a restricted (OpenAPI 3.0-derived)
+    subset of JSON Schema: no `$defs`/`title`/`additionalProperties`, and —
+    the part a previous version of this function got wrong — no `$ref`
+    either. Pydantic v2 always emits `$ref`/`$defs` for a nested-model
+    field (e.g. `RawIntentResult.reference_delta: ReferenceDelta | None`),
+    so simply deleting `$defs` left a dangling `$ref` pointer and Gemini's
+    API rejected the whole schema outright ("Unknown name '$ref' ...
+    Cannot find field"), turning every query into a clarification-needed
+    response for a bug that had nothing to do with the actual query
+    (confirmed live against the real Gemini API while fixing this).
+
+    Fixed by resolving `$ref` inline from the top-level `$defs` (captured
+    once, threaded through the recursion) instead of merely deleting the
+    key.
     """
-    unsupported = {"title", "additionalProperties", "$defs", "definitions"}
+    if defs is None:
+        defs = schema.get("$defs", {}) if isinstance(schema, dict) else {}
+
     if isinstance(schema, dict):
-        return {k: _strip_unsupported_keys(v) for k, v in schema.items() if k not in unsupported}
+        if "$ref" in schema:
+            ref_name = schema["$ref"].rsplit("/", 1)[-1]
+            return _strip_unsupported_keys(defs.get(ref_name, {}), defs)
+        unsupported = {"title", "additionalProperties", "$defs", "definitions"}
+        return {k: _strip_unsupported_keys(v, defs) for k, v in schema.items() if k not in unsupported}
     if isinstance(schema, list):
-        return [_strip_unsupported_keys(item) for item in schema]
+        return [_strip_unsupported_keys(item, defs) for item in schema]
     return schema

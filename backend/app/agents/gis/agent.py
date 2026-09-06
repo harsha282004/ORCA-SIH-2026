@@ -96,6 +96,12 @@ class GISGeofencingAgent:
     def get_bathymetry_status(self) -> dict:
         return self.get_static_dataset_status("gebco_bathymetry")
 
+    def get_chlorophyll_status(self) -> dict:
+        return self.get_static_dataset_status("incois_chl")
+
+    def get_incois_sst_status(self) -> dict:
+        return self.get_static_dataset_status("incois_sst")
+
     def _query_dataset_status(self, dataset_name: str) -> dict:
         try:
             from app.data.storage import list_static_layer_sources
@@ -111,11 +117,22 @@ class GISGeofencingAgent:
 
         for row in rows:
             if row.get("dataset_name") == dataset_name:
+                acquired_at = row.get("acquired_at")
                 return {
                     "dataset_name": dataset_name,
                     "acquisition_status": row.get("acquisition_status", "unknown"),
                     "is_authoritative": row.get("is_authoritative", False),
                     "processing_notes": row.get("processing_notes"),
+                    # Phase 1 (Marine Data Foundation) additions — real
+                    # provenance recorded by scripts/acquire_marine_data_
+                    # foundation.py, passed through verbatim rather than
+                    # re-derived.
+                    "source_name": row.get("source_name"),
+                    "source_url": row.get("source_url"),
+                    "dataset_version": row.get("dataset_version"),
+                    "acquired_at": acquired_at.isoformat() if acquired_at else None,
+                    "geographic_coverage": row.get("geographic_coverage"),
+                    "metadata": row.get("metadata"),
                 }
 
         return {"dataset_name": dataset_name, "acquisition_status": "not_acquired", "reason": "no registry row found"}

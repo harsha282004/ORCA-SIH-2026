@@ -14,9 +14,27 @@ here.
 """
 from __future__ import annotations
 
+from app.agents.risk_suitability.models import RiskSuitabilityResult
 from app.decision.models import Decision
 from app.policy.models import SafetyGuardResult
 from app.risk.engine import RiskLevel
+
+
+def risk_inputs_for_decision(risk_suitability: RiskSuitabilityResult | None) -> tuple[RiskLevel, float, float]:
+    """Derives `(risk_level, risk_score, confidence)` for `make_decision`
+    from a `RiskSuitabilityResult` — shared by the live orchestration
+    `decision` node and the Scenario Engine (architecture.md §32) so both
+    use identically-derived conservative placeholders when
+    `risk_suitability` isn't "ok", rather than two independently-maintained
+    copies of this fallback.
+    """
+    if risk_suitability is not None and risk_suitability.status == "ok":
+        return risk_suitability.risk_result.level, risk_suitability.risk_result.score, risk_suitability.confidence
+    # Conservative placeholders — never actually determinative, since the
+    # Safety Guard's has_critical_missing_data always fires whenever
+    # risk_suitability isn't "ok", and make_decision maps any non-PASS
+    # safety outcome to NO_SAFE_RECOMMENDATION regardless of these values.
+    return "HIGH", 1.0, 0.0
 
 
 def make_decision(

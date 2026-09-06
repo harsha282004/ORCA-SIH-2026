@@ -41,6 +41,18 @@ def test_grok_with_valid_config_constructs_successfully() -> None:
     assert provider.provider_name == "grok"
 
 
+def test_groq_with_valid_config_constructs_successfully() -> None:
+    # "groq" (the inference platform) is deliberately distinct from "grok"
+    # (xAI) above — both must resolve independently and correctly.
+    provider = get_llm_provider(Settings(llm_provider="groq", llm_api_key="k", llm_model="openai/gpt-oss-120b"))
+    assert provider.provider_name == "groq"
+
+
+def test_groq_without_api_key_raises_configuration_error() -> None:
+    with pytest.raises(LLMConfigurationError):
+        get_llm_provider(Settings(llm_provider="groq", llm_api_key="", llm_model="openai/gpt-oss-120b"))
+
+
 def test_provider_selection_is_case_insensitive() -> None:
     provider = get_llm_provider(Settings(llm_provider="FAKE"))
     assert isinstance(provider, FakeLLMProvider)

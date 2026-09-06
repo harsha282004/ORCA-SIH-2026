@@ -82,6 +82,15 @@ def _collect_numeric_values(provenance: DecisionProvenanceGraph) -> list[float]:
     if provenance.route is not None:
         values.append(provenance.route.distance_km)
         values.append(provenance.route.total_cost)
+    if provenance.scenario is not None:
+        values.extend(
+            [
+                provenance.scenario.baseline_value,
+                provenance.scenario.scenario_value,
+                provenance.scenario.baseline_risk_score,
+                provenance.scenario.scenario_risk_score,
+            ]
+        )
     if provenance.decision is not None:
         values.append(provenance.decision.risk_score)
         values.append(provenance.decision.confidence)
@@ -95,8 +104,18 @@ def _build_system_prompt(provenance: DecisionProvenanceGraph, *, language: str, 
         "suitability": provenance.suitability.model_dump(mode="json") if provenance.suitability else None,
         "safety": provenance.safety.model_dump(mode="json") if provenance.safety else None,
         "route": provenance.route.model_dump(mode="json") if provenance.route else None,
+        "scenario": provenance.scenario.model_dump(mode="json") if provenance.scenario else None,
         "conflicts": [c.model_dump(mode="json") for c in provenance.conflicts],
     }
+    scenario_instruction = ""
+    if provenance.scenario is not None:
+        scenario_instruction = (
+            "\n\nThis is a WHAT-IF SCENARIO, not a live forecast: `scenario.baseline_value` is the REAL observed/"
+            "forecast value; `scenario.scenario_value` is a value the USER asked you to assume, never something "
+            "Open-Meteo actually reported. Clearly distinguish the two in your explanation (e.g. \"real conditions "
+            "show X; if it changed to Y, then...\") — never present the assumed value as an actual forecast or "
+            "observation."
+        )
     return f"""You are ORCA's Evidence & Explanation component for a marine-safety assistant.
 
 You must produce a short, clear explanation grounded ONLY in the structured facts below.
@@ -105,7 +124,7 @@ risk or safety — those are already decided. Respond in language code "{languag
 level of detail appropriate for a "{persona}".
 
 CRITICAL: if decision.outcome is "NO_SAFE_RECOMMENDATION", you must NOT say the situation
-is safe, recommend the activity, or imply it is acceptable to proceed.
+is safe, recommend the activity, or imply it is acceptable to proceed.{scenario_instruction}
 
 Structured facts (JSON):
 {json.dumps(facts, indent=2)}

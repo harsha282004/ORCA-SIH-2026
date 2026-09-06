@@ -25,12 +25,34 @@ _PLACE_BUFFER_DEG = 0.03
 # A small, explicitly-curated gazetteer for the ONLY supported demo region
 # (Mangaluru-Udupi coastal Karnataka, architecture.md §44) — not a general
 # geocoder. Coordinates are approximate town-center reference points.
+#
+# Phase 6 finding (task §28, live-verified): a real Kannada query naming
+# "ಮಂಗಳೂರು" was correctly rejected with a clarification request — the
+# ENGLISH-only gazetteer genuinely did not recognize the native-script
+# spelling, even though the LLM extracted it faithfully (not a
+# hallucination; a real, well-formed place name in the user's own script).
+# "Preserve the existing place-resolution behavior... resolve consistently
+# if the existing gazetteer supports both" — extended here with the native
+# Kannada/Hindi spellings for the SAME five reference points, never new
+# coordinates, never a fuzzy/approximate match. A name in a script this
+# gazetteer does not cover still correctly asks for clarification, per
+# task §28's own "if a place cannot be resolved confidently: ask for
+# clarification, do not guess coordinates."
 _KNOWN_PLACES: dict[str, tuple[float, float]] = {
     "mangaluru": (12.87, 74.85),
     "mangalore": (12.87, 74.85),  # common alternate spelling
+    "ಮಂಗಳೂರು": (12.87, 74.85),  # Kannada
+    "मंगलुरु": (12.87, 74.85),  # Hindi
+    "मंगलौर": (12.87, 74.85),  # Hindi, common alternate spelling
     "udupi": (13.34, 74.75),
+    "ಉಡುಪಿ": (13.34, 74.75),  # Kannada
+    "उडुपी": (13.34, 74.75),  # Hindi
     "malpe": (13.35, 74.71),
+    "ಮಲ್ಪೆ": (13.35, 74.71),  # Kannada
+    "मल्पे": (13.35, 74.71),  # Hindi
     "ullal": (12.80, 74.86),
+    "ಉಳ್ಳಾಲ": (12.80, 74.86),  # Kannada
+    "उल्लाल": (12.80, 74.86),  # Hindi
 }
 
 

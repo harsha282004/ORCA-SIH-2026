@@ -66,7 +66,7 @@ class OceanographicIntelligenceAgent:
                     expected_parameter_count=len(REQUIRED_HOURLY_PARAMETERS),
                     source_tier_override="synthetic",
                     status="degraded",
-                    warnings=["DEMO DATA / SIMULATION — NOT LIVE DATA: live and cached marine data unavailable"],
+                    warnings=[f"DEMO DATA / SIMULATION — NOT LIVE DATA: live and cached marine data unavailable ({exc})"],
                 )
             return build_failed_agent_result(
                 mode=mode, latitude=latitude, longitude=longitude, requested_time=requested_time, errors=[str(exc)]

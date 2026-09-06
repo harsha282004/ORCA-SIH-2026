@@ -1,99 +1,93 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense } from "react";
+import { Route, Routes } from "react-router-dom";
 
-import { API_BASE_URL } from "./config";
+import { Footer } from "./components/layout/Footer";
+import { Navbar } from "./components/layout/Navbar";
+import { AskOrcaPage } from "./routes/AskOrcaPage";
+import { HomePage } from "./routes/HomePage";
+import { StatusPage } from "./routes/StatusPage";
 
-type DependencyStatus = "healthy" | "unhealthy";
+// Code-split: RoutePlannerPage pulls in maplibre-gl (a real WebGL map
+// engine, ~800kB) — lazy-loading it means that weight is only ever
+// downloaded by a visitor who actually opens the Route Planner, never by
+// the landing page (which is already the most performance-sensitive page,
+// carrying the 1,200-frame cinematic sequence).
+const RoutePlannerPage = lazy(() => import("./routes/RoutePlannerPage").then((m) => ({ default: m.RoutePlannerPage })));
+// Same reasoning — the Marine Intelligence Map also mounts MapLibre/deck.gl.
+const MarineMapPage = lazy(() => import("./routes/MarineMapPage").then((m) => ({ default: m.MarineMapPage })));
+// Same reasoning — the Fishing Intelligence page also mounts MapLibre/deck.gl.
+const FishingPage = lazy(() => import("./routes/FishingPage").then((m) => ({ default: m.FishingPage })));
+// Same reasoning — the Marine Safety page (Phase 4) also mounts MapLibre/deck.gl.
+const SafetyPage = lazy(() => import("./routes/SafetyPage").then((m) => ({ default: m.SafetyPage })));
+// Same reasoning — the Dashboard (Phase 8) also mounts MapLibre/deck.gl.
+const DashboardPage = lazy(() => import("./routes/DashboardPage").then((m) => ({ default: m.DashboardPage })));
 
-interface ReadinessResponse {
-  status: "ready" | "not_ready";
-  dependencies: {
-    database: DependencyStatus;
-    postgis: DependencyStatus;
-    redis: DependencyStatus;
-  };
-}
-
-type ReadinessState =
-  | { kind: "loading" }
-  | { kind: "unreachable"; message: string }
-  | { kind: "loaded"; data: ReadinessResponse };
-
-function badgeClasses(healthy: boolean | null): string {
-  if (healthy === null) return "bg-slate-500";
-  return healthy ? "bg-emerald-600" : "bg-red-600";
-}
-
-function StatusRow({ label, status }: { label: string; status: DependencyStatus | null }) {
-  const healthy = status === null ? null : status === "healthy";
-  const text = status === null ? "unknown" : status;
+function RouteLoadingFallback() {
   return (
-    <div className="flex items-center justify-between border-b border-slate-700 py-2 last:border-b-0">
-      <span className="text-slate-200">{label}</span>
-      <span className={`rounded px-2 py-0.5 text-sm font-medium text-white ${badgeClasses(healthy)}`}>
-        {text}
-      </span>
-    </div>
+    <main className="flex min-h-screen items-center justify-center bg-marine-deep pt-20">
+      <p className="text-sm font-medium uppercase tracking-[0.3em] text-marine-cyan-light">Loading…</p>
+    </main>
   );
 }
 
 export default function App() {
-  const [state, setState] = useState<ReadinessState>({ kind: "loading" });
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function fetchReadiness() {
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/health/ready`);
-        const data = (await response.json()) as ReadinessResponse;
-        if (!cancelled) setState({ kind: "loaded", data });
-      } catch (err) {
-        if (!cancelled) {
-          setState({
-            kind: "unreachable",
-            message: err instanceof Error ? err.message : "Unknown error",
-          });
-        }
-      }
-    }
-
-    fetchReadiness();
-    const interval = window.setInterval(fetchReadiness, 10000);
-    return () => {
-      cancelled = true;
-      window.clearInterval(interval);
-    };
-  }, []);
-
-  const backendReachable = state.kind === "loaded" ? true : state.kind === "unreachable" ? false : null;
-  const dependencies = state.kind === "loaded" ? state.data.dependencies : null;
-
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-900 px-4 text-slate-100">
-      <div className="w-full max-w-md">
-        <h1 className="text-4xl font-bold tracking-tight">ORCA</h1>
-        <p className="mt-1 text-slate-400">Marine EcOsystem Reasoning with Collaborative Agents</p>
-
-        <div className="mt-8 rounded-lg border border-slate-700 bg-slate-800 p-4">
-          <h2 className="mb-2 text-lg font-semibold">System Status</h2>
-
-          <StatusRow label="Backend" status={backendReachable ? "healthy" : backendReachable === false ? "unhealthy" : null} />
-          <StatusRow label="PostgreSQL" status={dependencies?.database ?? null} />
-          <StatusRow label="PostGIS" status={dependencies?.postgis ?? null} />
-          <StatusRow label="Redis" status={dependencies?.redis ?? null} />
-
-          {state.kind === "loading" && (
-            <p className="pt-3 text-sm text-slate-400">Checking backend status...</p>
-          )}
-          {state.kind === "unreachable" && (
-            <p className="pt-3 text-sm text-red-400">Backend unavailable: {state.message}</p>
-          )}
-        </div>
-
-        <p className="mt-6 text-xs text-slate-500">
-          Phase 0 — Infrastructure only. No marine-intelligence functionality is implemented yet.
-        </p>
+    <div className="min-h-screen bg-marine-deep">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-marine-cyan focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-marine-deep"
+      >
+        Skip to content
+      </a>
+      <Navbar />
+      <div id="main-content">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/ask-orca" element={<AskOrcaPage />} />
+          <Route
+            path="/route-planner"
+            element={
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <RoutePlannerPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/marine-map"
+            element={
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <MarineMapPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/fishing"
+            element={
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <FishingPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/safety"
+            element={
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <SafetyPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <DashboardPage />
+              </Suspense>
+            }
+          />
+          <Route path="/status" element={<StatusPage />} />
+        </Routes>
       </div>
+      <Footer />
     </div>
   );
 }

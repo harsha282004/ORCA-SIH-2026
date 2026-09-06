@@ -27,7 +27,7 @@ from datetime import datetime
 from geoalchemy2 import Geometry
 from geoalchemy2.shape import from_shape
 from shapely.geometry import Point
-from sqlalchemy import Boolean, Column, DateTime, Float, Index, MetaData, String, Table, Text, func, insert, select
+from sqlalchemy import Boolean, Column, DateTime, Float, Index, MetaData, String, Table, Text, func, insert, select, text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.engine import Engine
@@ -89,12 +89,30 @@ static_layer_sources = Table(
     Column("geographic_coverage", JSONB, nullable=True),
     Column("crs", String, nullable=False, server_default="EPSG:4326"),
     Column("processing_notes", Text, nullable=True),
+    # Phase 1 (Marine Data Foundation) addition — extensible provenance
+    # detail that doesn't warrant its own narrow column per field (file
+    # sizes, checksums, resolution, feature/cell counts, license). Mirrors
+    # the same JSONB "escape hatch" pattern `environmental_observations
+    # .metadata` already uses; no new column-per-fact sprawl.
+    Column("metadata", JSONB, nullable=True),
     Column("created_at", DateTime(timezone=True), server_default=func.now(), nullable=False),
 )
 
 
 def create_tables(engine: Engine) -> None:
     metadata_obj.create_all(engine, checkfirst=True)
+    _ensure_schema_upgrades(engine)
+
+
+def _ensure_schema_upgrades(engine: Engine) -> None:
+    """Lightweight, idempotent ALTERs for columns added to an ALREADY-
+    created table after its first deployment — no Alembic/migration
+    framework introduced (frozen architecture), just the same
+    `IF NOT EXISTS` discipline Postgres itself provides. Safe to run on
+    every startup/script invocation.
+    """
+    with engine.begin() as conn:
+        conn.execute(text("ALTER TABLE static_layer_sources ADD COLUMN IF NOT EXISTS metadata JSONB"))
 
 
 def _observation_to_row(obs: NormalizedObservation) -> dict:
@@ -145,6 +163,7 @@ def upsert_static_layer_source(
     dataset_version: str | None = None,
     geographic_coverage: dict | None = None,
     processing_notes: str | None = None,
+    metadata: dict | None = None,
 ) -> None:
     stmt = pg_insert(static_layer_sources).values(
         id=str(uuid.uuid4()),
@@ -158,6 +177,7 @@ def upsert_static_layer_source(
         dataset_version=dataset_version,
         geographic_coverage=geographic_coverage,
         processing_notes=processing_notes,
+        metadata=metadata,
     )
     update_cols = {
         col.name: col
