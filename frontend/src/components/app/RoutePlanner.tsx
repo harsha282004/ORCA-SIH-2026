@@ -4,6 +4,7 @@ import { planRoute, ApiRequestError, type RouteResultData, type ApiErrorDetail, 
 import { ComparisonBarChart } from "../charts/ComparisonBarChart";
 import { LineSeriesChart, type ChartSeries } from "../charts/LineSeriesChart";
 import { EvidenceList, type EvidenceRow } from "../evidence/Evidence";
+import { Button } from "../ui/Button";
 
 // Reference points within the demo coastal region (Mangaluru–Udupi),
 // verified as open water against ORCA's own routing test fixtures.
@@ -89,23 +90,19 @@ export function RoutePlanner({ onStateChange }: RoutePlannerProps = {}) {
         <CoordinateFields label="Origin" value={origin} onChange={setOrigin} />
         <CoordinateFields label="Destination" value={destination} onChange={setDestination} />
 
-        <label className="flex items-center gap-2 text-xs text-marine-white/70 sm:col-span-2">
+        <label className="flex items-center gap-2 text-sm text-marine-white/70 sm:col-span-2">
           <input
             type="checkbox"
             checked={findAlternatives}
             onChange={(e) => setFindAlternatives(e.target.checked)}
-            className="h-3.5 w-3.5 accent-marine-cyan"
+            className="h-4 w-4 accent-marine-cyan"
           />
           Find alternative routes for comparison
         </label>
 
-        <button
-          type="submit"
-          disabled={state.kind === "loading"}
-          className="sm:col-span-2 rounded-full bg-marine-cyan px-5 py-2.5 text-sm font-semibold text-marine-deep transition-colors hover:bg-marine-cyan-light disabled:cursor-not-allowed disabled:opacity-50"
-        >
+        <Button type="submit" size="lg" disabled={state.kind === "loading"} loading={state.kind === "loading"} className="sm:col-span-2">
           {state.kind === "loading" ? "Calculating route…" : "Calculate Route"}
-        </button>
+        </Button>
       </form>
 
       {state.kind === "loading" && (
@@ -125,8 +122,8 @@ export function RoutePlanner({ onStateChange }: RoutePlannerProps = {}) {
       {state.kind === "result" && (
         <div className="mt-6 space-y-4">
           {/* --- ROUTE OPTIONS ------------------------------------------- */}
-          <div className="space-y-2">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-marine-cyan-light">
+          <div className="space-y-2.5">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">
               Route Option{state.routes.length > 1 ? "s" : ""}
             </h3>
             {state.routes.map((route) => (
@@ -134,34 +131,34 @@ export function RoutePlanner({ onStateChange }: RoutePlannerProps = {}) {
                 key={route.label}
                 type="button"
                 onClick={() => setSelectedLabel(route.label)}
-                className={`flex w-full items-center justify-between rounded-xl border px-4 py-2.5 text-left text-sm transition-colors ${
+                className={`flex w-full flex-wrap items-center justify-between gap-2 rounded-xl border px-4 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marine-cyan ${
                   route.label === selectedLabel
                     ? "border-marine-cyan bg-marine-cyan/10"
                     : "border-marine-cyan/15 bg-marine-ocean/30 hover:border-marine-cyan/40"
                 }`}
               >
                 <span className="flex items-center gap-3">
-                  <span className="font-semibold text-marine-white">Route {route.label}</span>
-                  <span className="text-marine-white/60">{route.metrics.total_distance_km.toFixed(1)} km</span>
+                  <span className="text-base font-semibold text-marine-white">Route {route.label}</span>
+                  <span className="text-sm text-marine-white/60">{route.metrics.total_distance_km.toFixed(1)} km</span>
                   {state.comparison?.recommended_label === route.label && (
-                    <span className="rounded-full border border-marine-cyan/40 bg-marine-cyan/15 px-2 py-0.5 text-[10px] font-semibold text-marine-cyan-light">
+                    <span className="rounded-full border border-marine-cyan/40 bg-marine-cyan/15 px-2.5 py-0.5 text-xs font-semibold text-marine-cyan-light">
                       ORCA PICK
                     </span>
                   )}
                 </span>
                 <span className="flex items-center gap-2">
-                  <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${RISK_BADGE_CLASS[route.risk_level] ?? ""}`}>
+                  <span className={`rounded-full border px-2.5 py-0.5 text-xs font-semibold ${RISK_BADGE_CLASS[route.risk_level] ?? ""}`}>
                     {route.risk_level} RISK
                   </span>
-                  <span className="text-[10px] font-medium text-marine-white/50">{DECISION_LABEL[route.decision.outcome] ?? route.decision.outcome}</span>
+                  <span className="text-xs font-medium text-marine-white/50">{DECISION_LABEL[route.decision.outcome] ?? route.decision.outcome}</span>
                 </span>
               </button>
             ))}
           </div>
 
           {state.routes.length > 1 && (
-            <div className="rounded-xl border border-marine-cyan/15 bg-marine-ocean/30 p-3">
-              <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-marine-cyan-light">Route Risk Comparison</p>
+            <div className="rounded-xl border border-marine-cyan/15 bg-marine-ocean/30 p-4">
+              <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">Route Risk Comparison</p>
               <ComparisonBarChart
                 height={140}
                 groups={state.routes.map((r) => ({
@@ -176,49 +173,73 @@ export function RoutePlanner({ onStateChange }: RoutePlannerProps = {}) {
           )}
 
           {state.comparison && (
-            <div className="rounded-xl border border-marine-cyan/20 bg-marine-ocean/40 p-3 text-xs leading-relaxed text-marine-white/80">
-              <p className="mb-1 font-semibold uppercase tracking-wide text-marine-cyan-light">Comparison</p>
+            <div className="rounded-xl border border-marine-cyan/20 bg-marine-ocean/40 p-4 text-sm leading-relaxed text-marine-white/80">
+              <p className="mb-1.5 text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">Comparison</p>
               {state.comparison.reason}
             </div>
           )}
 
-          {/* --- SELECTED ROUTE -------------------------------------------- */}
+          {/* --- SELECTED ROUTE --------------------------------------------
+              Phase 8 fix: Distance and Confidence (and every other metric)
+              used to sit as plain dt/dd text pairs in a 2-column grid with
+              no visual boundary between them — legible individually but
+              easy to misread as one continuous line, and the task's own
+              complaint was about them "overlapping". Each metric is now its
+              own bordered card, matching the Dashboard's Route Intelligence
+              panel for consistency across the app. */}
           {selectedRoute && (
-            <div className="space-y-3 rounded-xl border border-marine-cyan/20 bg-marine-ocean/50 p-4 text-sm shadow-sm backdrop-blur">
-              <div className="flex flex-wrap gap-2">
-                <span className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${RISK_BADGE_CLASS[selectedRoute.risk_level] ?? ""}`}>
-                  {selectedRoute.risk_level} RISK
-                </span>
-                <span className="rounded-full border border-marine-cyan/30 bg-marine-cyan/10 px-2.5 py-0.5 text-xs font-medium text-marine-cyan-light">
-                  {selectedRoute.data_quality === "live" ? "Live environmental data" : "Fixture data"}
-                </span>
-                <span className="rounded-full border border-marine-white/20 bg-marine-white/5 px-2.5 py-0.5 text-xs font-medium text-marine-white/70">
-                  Safety: {selectedRoute.safety.outcome}
-                </span>
+            <div className="space-y-4 rounded-xl border border-marine-cyan/20 bg-marine-ocean/50 p-5 shadow-sm backdrop-blur">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-lg font-semibold text-marine-white">Route {selectedRoute.label}</h3>
+                <div className="flex flex-wrap justify-end gap-2">
+                  <span className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${RISK_BADGE_CLASS[selectedRoute.risk_level] ?? ""}`}>
+                    {selectedRoute.risk_level} RISK
+                  </span>
+                  <span className="rounded-full border border-marine-cyan/30 bg-marine-cyan/10 px-2.5 py-0.5 text-xs font-medium text-marine-cyan-light">
+                    {selectedRoute.data_quality === "live" ? "Live environmental data" : "Fixture data"}
+                  </span>
+                  <span className="rounded-full border border-marine-white/20 bg-marine-white/5 px-2.5 py-0.5 text-xs font-medium text-marine-white/70">
+                    Safety: {selectedRoute.safety.outcome}
+                  </span>
+                </div>
               </div>
-              <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-marine-white">
-                <dt className="text-marine-white/50">Distance</dt>
-                <dd>{selectedRoute.metrics.total_distance_km.toFixed(2)} km</dd>
-                <dt className="text-marine-white/50">Confidence</dt>
-                <dd>{(selectedRoute.confidence * 100).toFixed(0)}%</dd>
-                <dt className="text-marine-white/50">Avg. risk score</dt>
-                <dd>{selectedRoute.metrics.average_risk_score?.toFixed(3) ?? "—"}</dd>
-                <dt className="text-marine-white/50">Max risk score</dt>
-                <dd>{selectedRoute.metrics.max_risk_score?.toFixed(3) ?? "—"}</dd>
-                <dt className="text-marine-white/50">Hazards near route</dt>
-                <dd>
-                  {selectedRoute.hazards_near_route.length === 0
-                    ? "No relevant hazards detected from available data."
-                    : `${selectedRoute.hazards_near_route.length} detected (${selectedRoute.hazards_near_route.map((h) => h.severity).join(", ")})`}
-                </dd>
-                <dt className="text-marine-white/50">Hazard data source</dt>
-                <dd className="capitalize">{selectedRoute.hazard_source_tier}</dd>
-              </dl>
+
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                <div className="rounded-xl border border-marine-cyan/10 bg-marine-deep/40 p-3.5">
+                  <p className="text-xs text-marine-white/40">Distance</p>
+                  <p className="mt-1 text-xl font-semibold text-marine-white">{selectedRoute.metrics.total_distance_km.toFixed(1)} km</p>
+                </div>
+                <div className="rounded-xl border border-marine-cyan/10 bg-marine-deep/40 p-3.5">
+                  <p className="text-xs text-marine-white/40">Confidence</p>
+                  <p className="mt-1 text-xl font-semibold text-marine-white">{(selectedRoute.confidence * 100).toFixed(0)}%</p>
+                </div>
+                <div className="rounded-xl border border-marine-cyan/10 bg-marine-deep/40 p-3.5">
+                  <p className="text-xs text-marine-white/40">Avg. Risk Score</p>
+                  <p className="mt-1 text-xl font-semibold text-marine-white">{selectedRoute.metrics.average_risk_score?.toFixed(3) ?? "—"}</p>
+                </div>
+                <div className="rounded-xl border border-marine-cyan/10 bg-marine-deep/40 p-3.5">
+                  <p className="text-xs text-marine-white/40">Max Risk Score</p>
+                  <p className="mt-1 text-xl font-semibold text-marine-white">{selectedRoute.metrics.max_risk_score?.toFixed(3) ?? "—"}</p>
+                </div>
+                <div className="rounded-xl border border-marine-cyan/10 bg-marine-deep/40 p-3.5">
+                  <p className="text-xs text-marine-white/40">Hazards</p>
+                  <p className="mt-1 text-xl font-semibold text-marine-white">
+                    {selectedRoute.hazards_near_route.length === 0 ? "None detected" : selectedRoute.hazards_near_route.length}
+                  </p>
+                  {selectedRoute.hazards_near_route.length > 0 && (
+                    <p className="mt-0.5 text-xs text-marine-white/50">{selectedRoute.hazards_near_route.map((h) => h.severity).join(", ")}</p>
+                  )}
+                </div>
+                <div className="rounded-xl border border-marine-cyan/10 bg-marine-deep/40 p-3.5">
+                  <p className="text-xs text-marine-white/40">Hazard Data Source</p>
+                  <p className="mt-1 text-xl font-semibold capitalize text-marine-white">{selectedRoute.hazard_source_tier}</p>
+                </div>
+              </div>
               <p className="text-xs italic text-marine-white/50">{selectedRoute.disclaimer}</p>
 
               {selectedRoute.path_cells.length > 1 && (
                 <div>
-                  <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-marine-cyan-light">Route Risk Profile</p>
+                  <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">Route Risk Profile</p>
                   <LineSeriesChart
                     height={160}
                     xLabel={(_p, i) => (i % Math.ceil(selectedRoute.path_cells.length / 8) === 0 ? String(i) : "")}

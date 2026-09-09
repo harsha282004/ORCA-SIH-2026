@@ -44,10 +44,10 @@ export function MapLegend({ only }: { only?: MapLegendSectionKey[] } = {}) {
       <button
         type="button"
         onClick={() => setCollapsed((c) => !c)}
-        className="flex w-full items-center justify-between px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-marine-cyan-light"
+        className="flex w-full items-center justify-between px-3.5 py-3 text-sm font-semibold uppercase tracking-wide text-marine-cyan-light"
       >
         Legend
-        <ChevronDown size={14} className={`transition-transform ${collapsed ? "-rotate-90" : ""}`} />
+        <ChevronDown size={16} className={`transition-transform ${collapsed ? "-rotate-90" : ""}`} />
       </button>
 
       {!collapsed && (

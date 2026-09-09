@@ -15,6 +15,7 @@ from app.api.v1.safety import router as safety_v1_router
 from app.api.v1.query import router as query_v1_router
 from app.api.v1.route import router as route_v1_router
 from app.api.v1.scenario import router as scenario_v1_router
+from app.api.v1.voice import router as voice_v1_router
 from app.config import get_settings
 
 settings = get_settings()
@@ -52,6 +53,7 @@ app.include_router(alerts_v1_router, prefix="/api/v1")
 app.include_router(layers_v1_router, prefix="/api/v1")
 app.include_router(fishing_v1_router, prefix="/api/v1")
 app.include_router(safety_v1_router, prefix="/api/v1")
+app.include_router(voice_v1_router, prefix="/api/v1")
 
 
 @app.get("/health")

@@ -47,17 +47,13 @@ export function CapabilitiesSection() {
           </h2>
         </RevealOnScroll>
 
-        <div className="mt-16 divide-y divide-marine-cyan/10 border-t border-marine-cyan/10">
+        <div className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {CAPABILITIES.map((capability, index) => (
             <RevealOnScroll key={capability.title} delayMs={index * 60}>
-              <div className="grid gap-3 py-8 sm:grid-cols-[100px_1fr] sm:gap-8">
-                <span className="text-sm text-marine-cyan-light sm:text-base">{String(index + 1).padStart(2, "0")}</span>
-                <div>
-                  <h3 className="text-xl font-semibold text-marine-white sm:text-2xl">{capability.title}</h3>
-                  <p className="mt-2 max-w-2xl text-sm leading-relaxed text-marine-white/70 sm:text-base">
-                    {capability.description}
-                  </p>
-                </div>
+              <div className="h-full rounded-2xl border border-marine-cyan/15 bg-marine-ocean/25 p-6 transition-colors hover:border-marine-cyan/35 hover:bg-marine-ocean/35">
+                <span className="text-sm font-semibold text-marine-cyan-light">{String(index + 1).padStart(2, "0")}</span>
+                <h3 className="mt-3 text-xl font-semibold text-marine-white">{capability.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-marine-white/70">{capability.description}</p>
               </div>
             </RevealOnScroll>
           ))}

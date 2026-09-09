@@ -20,15 +20,22 @@ function rangeProgress(value: number, start: number, end: number): number {
   return clamp01((value - start) / (end - start));
 }
 
-// Each hero text element fades in over its own short window of overall
-// cinematic progress and then holds — a progressive build-up (eyebrow ->
-// headline -> description -> CTA) rather than everything appearing at
-// once, per the requested "chapters" pacing. All four fade back out
-// together during the hero's own end transition (CINEMATIC_TRANSITION_START).
-const EYEBROW_RANGE: [number, number] = [0.0, 0.06];
-const HEADLINE_RANGE: [number, number] = [0.08, 0.2];
-const DESCRIPTION_RANGE: [number, number] = [0.24, 0.36];
-const CTA_RANGE: [number, number] = [0.4, 0.52];
+// Phase 10 redesign: the branding/headline used to be INVISIBLE at
+// progress=0 (each element's own reveal range started above 0, e.g. the
+// eyebrow needed 0-6% scroll before showing at all) — a real gap against
+// "when the website initially loads, place ORCA branding on the left
+// side," reproduced live (a fresh page load showed only the nav bar over
+// the coastal image, no heading, until the visitor scrolled). The text now
+// enters via a short staggered fade-in driven directly on mount (below),
+// so it is legible immediately with NO scroll required. A CSS keyframe
+// class was deliberately NOT used here: `animation-fill-mode: both/
+// forwards` keeps overriding an element's opacity for as long as the
+// animation stays attached, which would fight the scroll-driven end-fade
+// below (inline styles lose that cascade battle to a still-attached
+// animation). Plain inline-style transitions have no such conflict — the
+// same imperative style this file already uses for the scroll handler.
+const STAGGER_DELAY_MS = [0, 150, 300, 450];
+const ENTRANCE_TRANSITION = "opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)";
 
 export function CinematicOverlay({ scrollHandle, reducedMotion }: CinematicOverlayProps) {
   const eyebrowRef = useRef<HTMLParagraphElement | null>(null);
@@ -40,45 +47,58 @@ export function CinematicOverlay({ scrollHandle, reducedMotion }: CinematicOverl
   useEffect(() => {
     if (reducedMotion) return;
 
-    const applyReveal = (el: HTMLElement | null, revealAmount: number) => {
+    const elements = [eyebrowRef.current, headlineRef.current, descriptionRef.current, ctaRef.current];
+    const timers = elements.map((el, i) =>
+      window.setTimeout(() => {
+        if (!el) return;
+        el.style.transition = ENTRANCE_TRANSITION;
+        el.style.opacity = "1";
+        el.style.transform = "translateY(0px)";
+      }, STAGGER_DELAY_MS[i]),
+    );
+
+    const applyEndFade = (el: HTMLElement | null, endFade: number) => {
       if (!el) return;
-      el.style.opacity = String(revealAmount);
-      el.style.transform = `translateY(${(1 - revealAmount) * 16}px)`;
+      // Only ever DAMPENS opacity for the hand-off transition — the mount
+      // entrance above already brought it to 1, so a fresh page load is
+      // never gated behind a scroll gesture.
+      el.style.opacity = String(endFade);
     };
 
     const unsubscribe = scrollHandle.subscribe((progress) => {
-      // All four elements fade back out together during the hero's own
-      // hand-off transition, so the text never overlaps the next section.
       const endFade = 1 - rangeProgress(progress, CINEMATIC_TRANSITION_START, 1);
 
-      applyReveal(eyebrowRef.current, rangeProgress(progress, ...EYEBROW_RANGE) * endFade);
-      applyReveal(headlineRef.current, rangeProgress(progress, ...HEADLINE_RANGE) * endFade);
-      applyReveal(descriptionRef.current, rangeProgress(progress, ...DESCRIPTION_RANGE) * endFade);
-      applyReveal(ctaRef.current, rangeProgress(progress, ...CTA_RANGE) * endFade);
+      applyEndFade(eyebrowRef.current, endFade);
+      applyEndFade(headlineRef.current, endFade);
+      applyEndFade(descriptionRef.current, endFade);
+      applyEndFade(ctaRef.current, endFade);
 
       if (scrollHintRef.current) {
         scrollHintRef.current.style.opacity = String(clamp01(1 - progress * 12));
       }
     });
 
-    return unsubscribe;
+    return () => {
+      timers.forEach((t) => window.clearTimeout(t));
+      unsubscribe();
+    };
   }, [scrollHandle, reducedMotion]);
 
-  const staticStyle = reducedMotion ? { opacity: 1, transform: "none" } : { opacity: 0, transform: "translateY(16px)" };
+  const initialStyle = reducedMotion ? { opacity: 1, transform: "none" } : { opacity: 0, transform: "translateY(16px)" };
 
   return (
     <div className="pointer-events-none absolute inset-0 flex flex-col justify-end p-6 sm:p-10 lg:p-16">
       <div className="max-w-3xl">
         <p
           ref={eyebrowRef}
-          style={staticStyle}
+          style={initialStyle}
           className="mb-5 text-xs font-medium uppercase tracking-[0.35em] text-orca-mint"
         >
-          Ocean Intelligence for a Safer Tomorrow
+          ORCA — Ocean Intelligence for a Safer Tomorrow
         </p>
         <h1
           ref={headlineRef}
-          style={staticStyle}
+          style={initialStyle}
           className="max-w-4xl text-4xl font-semibold leading-[1.05] tracking-tight text-orca-cream sm:text-6xl lg:text-7xl"
         >
           Safer Oceans.
@@ -87,13 +107,13 @@ export function CinematicOverlay({ scrollHandle, reducedMotion }: CinematicOverl
         </h1>
         <p
           ref={descriptionRef}
-          style={staticStyle}
+          style={initialStyle}
           className="mt-7 max-w-xl text-balance text-base leading-relaxed text-orca-cream/80 sm:text-lg"
         >
           AI-powered insights for safer routes, real-time risk awareness, and evidence-backed maritime decisions —
           for fishermen, researchers, and coastal authorities.
         </p>
-        <div ref={ctaRef} style={staticStyle} className="mt-9 flex flex-wrap items-center gap-4">
+        <div ref={ctaRef} style={initialStyle} className="mt-9 flex flex-wrap items-center gap-4">
           <Link
             to="/ask-orca"
             className="pointer-events-auto inline-flex items-center gap-2 rounded-full bg-orca-teal-strong px-6 py-3 text-sm font-semibold text-orca-cream transition-colors hover:bg-orca-mint hover:text-orca-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orca-mint focus-visible:ring-offset-2 focus-visible:ring-offset-orca-deep"

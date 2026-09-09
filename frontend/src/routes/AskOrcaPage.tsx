@@ -15,14 +15,9 @@ export function AskOrcaPage() {
       <div className="relative mx-auto max-w-3xl px-6 py-16 sm:px-10 sm:py-20">
         <p className="text-xs font-medium uppercase tracking-[0.3em] text-marine-cyan-light">Live &amp; Interactive</p>
         <h1 className="mt-4 text-3xl font-semibold tracking-tight text-marine-white sm:text-5xl">Ask ORCA.</h1>
-        <p className="mt-5 max-w-xl text-sm leading-relaxed text-marine-white/70 sm:text-base">
-          Ocean intelligence at your fingertips. Ask about weather, ocean conditions, marine safety, routes, risk,
-          or coastal conditions in the Mangaluru–Udupi region — this calls ORCA's live backend directly, not a
-          mockup. If the LLM provider or environmental data sources are unavailable in this deployment, ORCA will
-          say so honestly rather than fabricate a response.
-        </p>
+        <p className="mt-4 text-base text-marine-white/70">Ask ORCA about marine conditions, safety, fishing, or routes.</p>
 
-        <div className="mt-10">
+        <div className="mt-8">
           <AskOrca />
         </div>
       </div>

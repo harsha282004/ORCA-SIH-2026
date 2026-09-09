@@ -39,10 +39,13 @@ export function ProductExperienceSection() {
           </p>
         </RevealOnScroll>
 
-        <div className="mt-16 grid gap-x-10 gap-y-12 sm:grid-cols-3">
+        <div className="mt-16 grid gap-5 sm:grid-cols-3">
           {ENTRY_POINTS.map((entry, index) => (
             <RevealOnScroll key={entry.title} delayMs={index * 80}>
-              <Link to={entry.href} className="group block border-t border-marine-cyan/15 pt-6">
+              <Link
+                to={entry.href}
+                className="group block h-full rounded-2xl border border-marine-cyan/15 bg-marine-ocean/25 p-6 transition-colors hover:border-marine-cyan/35 hover:bg-marine-ocean/35"
+              >
                 <div className="flex items-center justify-between">
                   <h3 className="text-xl font-semibold text-marine-white">{entry.title}</h3>
                   <ArrowUpRight className="h-5 w-5 text-marine-cyan-light/70 transition-colors group-hover:text-marine-cyan-light" strokeWidth={1.75} />

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Anchor, Compass, RefreshCw, ShieldAlert, ShieldCheck, ShieldQuestion, TriangleAlert, Waves } from "lucide-react";
-import { Link } from "react-router-dom";
 
 import { RouteMap } from "../components/map/RouteMap";
 import { LayerControlPanel, type LayerGroup } from "../components/map/LayerControlPanel";
@@ -8,6 +7,8 @@ import { MapLegend, type MapLegendSectionKey } from "../components/map/MapLegend
 import { EvidencePanel } from "../components/map/EvidencePanel";
 import { LineSeriesChart, type ChartSeries } from "../components/charts/LineSeriesChart";
 import { EvidenceList, type EvidenceRow } from "../components/evidence/Evidence";
+import { ThunderstormCard } from "../components/hazards/HazardIntelCards";
+import { ButtonLink, Button } from "../components/ui/Button";
 import { useMarineLayers } from "../hooks/useMarineLayers";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 import {
@@ -21,6 +22,13 @@ import {
   type RouteResultData,
   type SafetyTemporalApiResponse,
 } from "../lib/api";
+
+// Phase 2 — a slightly wider real window than the original 6h default so
+// genuine (small) real hour-to-hour movement has more room to show; still
+// exactly what GET /api/v1/safety/temporal's own real Open-Meteo-backed
+// series returns for however many forecast hours it actually has (never
+// padded/looped to force a full 12).
+const TEMPORAL_WINDOW_HOURS = 12;
 
 // The same demo-region reference point already used by MarineMapPage/
 // SafetyPage (backend/app/config.py's DEMO_BBOX centroid) — one canonical
@@ -45,10 +53,10 @@ const SAFETY_STYLE: Record<MarineSafetyLevel, { text: string; bg: string; icon: 
 
 function ConditionTile({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
-    <div className="rounded-xl border border-marine-cyan/15 bg-marine-deep/60 px-4 py-3">
-      <p className="text-[10px] font-semibold uppercase tracking-wide text-marine-white/40">{label}</p>
-      <p className="mt-1 text-xl font-semibold text-marine-white">{value}</p>
-      {sub && <p className="mt-0.5 text-[10px] text-marine-white/50">{sub}</p>}
+    <div className="rounded-xl border border-marine-cyan/15 bg-marine-deep/60 px-4 py-4">
+      <p className="text-xs font-semibold uppercase tracking-wide text-marine-white/40">{label}</p>
+      <p className="mt-1.5 text-2xl font-semibold text-marine-white">{value}</p>
+      {sub && <p className="mt-0.5 text-xs text-marine-white/50">{sub}</p>}
     </div>
   );
 }
@@ -105,7 +113,7 @@ export function DashboardPage() {
       })
       .catch(() => setSafety({ kind: "error", message: "ORCA's backend is not reachable right now." }));
 
-    getTemporalSafety(REGION_CENTER.latitude, REGION_CENTER.longitude, 6)
+    getTemporalSafety(REGION_CENTER.latitude, REGION_CENTER.longitude, TEMPORAL_WINDOW_HOURS)
       .then((r) => {
         if (r.errors?.length) return setTemporal({ kind: "error", message: r.errors[0].message });
         setTemporal({ kind: "loaded", value: r.data });
@@ -238,34 +246,34 @@ export function DashboardPage() {
           <div className="flex flex-col items-center gap-4 rounded-2xl border border-marine-danger/40 bg-marine-danger/10 py-16 text-center">
             <ShieldAlert className="text-marine-danger" size={32} />
             <p className="text-sm font-semibold uppercase tracking-wide text-marine-danger">ORCA Data Connection Lost</p>
-            <button type="button" onClick={loadAll} className="rounded-full border border-marine-danger/40 px-4 py-2 text-xs font-medium text-marine-danger hover:bg-marine-danger/10">
+            <Button variant="danger" size="md" onClick={loadAll}>
               Retry
-            </button>
+            </Button>
           </div>
         ) : (
           <div className="orca-dashboard-grid">
             {/* --- HEADER --------------------------------------------------- */}
-            <div className="orca-dashboard-area-header flex flex-wrap items-end justify-between gap-4 border-b border-marine-cyan/10 pb-5">
+            <div className="orca-dashboard-area-header flex flex-wrap items-end justify-between gap-4 pb-2">
               <div>
                 <p className="text-xs font-medium uppercase tracking-[0.3em] text-marine-cyan-light">Marine Intelligence</p>
-                <h1 className="mt-2 text-2xl font-semibold tracking-tight text-marine-white sm:text-3xl">{REGION_LABEL}</h1>
-                <p className="mt-1 text-xs text-marine-white/50">
+                <h1 className="mt-2 text-3xl font-semibold tracking-tight text-marine-white sm:text-4xl">{REGION_LABEL}</h1>
+                <p className="mt-1.5 text-sm text-marine-white/50">
                   {safety.kind === "loaded" ? `Updated ${new Date(safety.value.generated_at).toLocaleString()}` : "Updating…"}
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-wide ${SAFETY_STYLE[level].bg} ${SAFETY_STYLE[level].text}`}>
-                  <LevelIcon size={13} /> {level}
+                <span className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-semibold uppercase tracking-wide ${SAFETY_STYLE[level].bg} ${SAFETY_STYLE[level].text}`}>
+                  <LevelIcon size={15} /> {level}
                 </span>
-                <button type="button" onClick={loadAll} className="flex items-center gap-1.5 rounded-full border border-marine-cyan/25 px-3 py-1.5 text-[11px] font-medium text-marine-cyan-light hover:border-marine-cyan hover:bg-marine-cyan/10">
-                  <RefreshCw size={12} /> Refresh
-                </button>
+                <Button variant="secondary" size="md" onClick={loadAll}>
+                  <RefreshCw size={14} /> Refresh
+                </Button>
               </div>
             </div>
 
             {/* --- CURRENT CONDITIONS ---------------------------------------- */}
             <section className="orca-dashboard-area-current">
-              <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-marine-cyan-light">Current Conditions</h2>
+              <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">Current Conditions</h2>
               {conditions.kind === "loading" ? (
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
                   {Array.from({ length: 5 }).map((_, i) => (
@@ -273,7 +281,7 @@ export function DashboardPage() {
                   ))}
                 </div>
               ) : conditions.kind === "error" ? (
-                <p className="text-xs text-marine-danger">{conditions.message}</p>
+                <p className="text-sm text-marine-danger">{conditions.message}</p>
               ) : (
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
                   <ConditionTile label="Wave" value={conditions.value.environmental_context?.wave_height_m != null ? `${conditions.value.environmental_context.wave_height_m.toFixed(1)} m` : "n/a"} sub="Forecast" />
@@ -289,8 +297,17 @@ export function DashboardPage() {
               )}
             </section>
 
-            {/* --- MAP ------------------------------------------------------- */}
-            <section className="orca-dashboard-area-map relative h-[55vh] min-h-[420px] overflow-hidden rounded-2xl border border-marine-cyan/15">
+            {/* --- MAP --------------------------------------------------------
+                Phase 1 fix: the map used to look "overlapped" because both
+                floating panels (Map Layers, top-left; Legend, bottom-right)
+                defaulted to fully expanded, growing tall enough to cover a
+                large share of the map and, on other pages using the same
+                panels, collide with each other. Both now default collapsed
+                (see LayerControlPanel/DataStatusPanel), and the map itself
+                is taller and sits in its own clearly bordered container,
+                never sharing space with the Safety panel (a separate grid
+                cell, task §1's "details must never overlap the map"). */}
+            <section className="orca-dashboard-area-map relative h-[70vh] min-h-[560px] overflow-hidden rounded-2xl border border-marine-cyan/15">
               <RouteMap origin={REGION_CENTER} destination={REGION_CENTER} routeCoordinates={null} reducedMotion={reducedMotion} className="h-full w-full" deckLayers={marine.deckLayers} />
               <div className="pointer-events-none absolute left-3 top-3 flex flex-col gap-3">
                 <LayerControlPanel groups={layerGroups} enabled={marine.enabled} onToggle={(k) => marine.toggleLayer(k as never)} onRefresh={marine.refresh} refreshing={marine.refreshing} />
@@ -304,32 +321,32 @@ export function DashboardPage() {
                 </div>
               )}
               <div className="pointer-events-none absolute bottom-3 left-3">
-                <Link to="/marine-map" className="pointer-events-auto rounded-full border border-marine-cyan/25 bg-marine-deep/90 px-3 py-1.5 text-[11px] font-medium text-marine-cyan-light hover:border-marine-cyan hover:bg-marine-cyan/10">
+                <ButtonLink to="/marine-map" variant="secondary" size="sm" className="pointer-events-auto bg-marine-deep/90">
                   Open full Marine Map →
-                </Link>
+                </ButtonLink>
               </div>
             </section>
 
             {/* --- SAFETY ------------------------------------------------------ */}
-            <section className="orca-dashboard-area-safety flex flex-col gap-3 rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-4">
-              <h2 className="text-xs font-semibold uppercase tracking-wide text-marine-cyan-light">Marine Safety</h2>
+            <section className="orca-dashboard-area-safety flex flex-col gap-4 rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-6">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">Marine Safety</h2>
               {safety.kind === "loading" && <SkeletonCard />}
-              {safety.kind === "error" && <p className="text-xs text-marine-danger">{safety.message}</p>}
+              {safety.kind === "error" && <p className="text-sm text-marine-danger">{safety.message}</p>}
               {safety.kind === "loaded" && (
                 <>
-                  <div className={`flex items-center gap-2 text-lg font-semibold ${SAFETY_STYLE[level].text}`}>
-                    <LevelIcon size={20} />
+                  <div className={`flex items-center gap-2.5 text-2xl font-semibold ${SAFETY_STYLE[level].text}`}>
+                    <LevelIcon size={24} />
                     {SAFETY_STYLE[level].label}
                   </div>
-                  <p className="text-xs leading-relaxed text-marine-white/70">{safety.value.reason}</p>
+                  <p className="text-sm leading-relaxed text-marine-white/70">{safety.value.reason}</p>
                   <div>
-                    <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-marine-white/40">Active Hazards</p>
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-marine-white/40">Active Hazards</p>
                     {safety.value.hazards.length === 0 ? (
-                      <p className="text-xs text-marine-success">No active verified hazards.</p>
+                      <p className="text-sm text-marine-success">No active verified hazards.</p>
                     ) : (
-                      <ul className="space-y-1.5">
+                      <ul className="space-y-2">
                         {safety.value.hazards.map((h, i) => (
-                          <li key={i} className="flex items-center justify-between rounded-lg border border-marine-cyan/10 bg-marine-deep/40 px-2.5 py-1.5 text-xs text-marine-white">
+                          <li key={i} className="flex items-center justify-between rounded-lg border border-marine-cyan/10 bg-marine-deep/40 px-3 py-2 text-sm text-marine-white">
                             <span>{h.title}</span>
                             <span className="font-semibold text-marine-warning">{h.severity}</span>
                           </li>
@@ -337,122 +354,156 @@ export function DashboardPage() {
                       </ul>
                     )}
                     {safety.value.unavailable_sources.length > 0 && (
-                      <p className="mt-2 text-[10px] italic text-marine-white/40">
+                      <p className="mt-2 text-xs italic text-marine-white/40">
                         Hazard data unavailable: {safety.value.unavailable_sources.map((u) => u.hazard_type).join(", ")}.
                       </p>
                     )}
                   </div>
-                  <Link to="/safety" className="mt-1 text-xs font-medium text-marine-cyan-light underline hover:text-marine-cyan">
+                  <ButtonLink to="/safety" variant="secondary" size="sm" className="mt-1 w-fit">
                     Open Marine Safety →
-                  </Link>
+                  </ButtonLink>
                 </>
               )}
             </section>
 
-            {/* --- TEMPORAL ------------------------------------------------- */}
-            <section className="orca-dashboard-area-temporal rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-4">
-              <div className="mb-3 flex items-center justify-between">
-                <h2 className="text-xs font-semibold uppercase tracking-wide text-marine-cyan-light">Marine Conditions — Temporal</h2>
+            {/* --- TEMPORAL -------------------------------------------------
+                Phase 2: this chart plots the SAME real per-hour Open-Meteo
+                series /safety/temporal returns everywhere else in the app —
+                never a hand-tuned curve. If real wave height barely moves
+                over the window (it currently does not — see the Source/
+                Updated block below), the line is genuinely, honestly flat;
+                see docs report §2 for the live values checked before this
+                redesign. */}
+            <section className="orca-dashboard-area-temporal rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-6">
+              <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">Marine Conditions — Temporal</h2>
                 {temporal.kind === "loaded" && temporal.value && (
-                  <span className="text-[10px] text-marine-white/40">Real hourly Open-Meteo forecast — never smoothed or extrapolated.</span>
+                  <span className="text-xs text-marine-white/40">Real hourly Open-Meteo forecast — never smoothed or extrapolated.</span>
                 )}
               </div>
               {temporal.kind === "loading" ? (
                 <SkeletonCard lines={4} />
               ) : temporal.kind === "error" ? (
-                <p className="text-xs text-marine-danger">{temporal.message}</p>
+                <p className="text-sm text-marine-danger">{temporal.message}</p>
               ) : (
-                <LineSeriesChart series={temporalChartSeries} highlightIndex={temporal.value?.best_time_index ?? null} />
+                <>
+                  {conditions.kind === "loaded" && conditions.value.environmental_context?.wave_height_m != null && (
+                    <div className="mb-4 flex flex-wrap items-end justify-between gap-4 border-b border-marine-cyan/10 pb-4">
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-marine-white/40">Wave Height</p>
+                        <p className="mt-1 text-3xl font-semibold text-marine-white">{conditions.value.environmental_context.wave_height_m.toFixed(2)} m</p>
+                        <span className="mt-1 inline-block rounded-full border border-marine-cyan/40 bg-marine-cyan/15 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-marine-cyan-light">
+                          Forecast
+                        </span>
+                      </div>
+                      <dl className="grid grid-cols-2 gap-x-6 gap-y-1 text-xs text-marine-white/60">
+                        <dt className="text-marine-white/40">Source</dt>
+                        <dd>Open-Meteo Marine</dd>
+                        <dt className="text-marine-white/40">Data Type</dt>
+                        <dd>Forecast (hourly)</dd>
+                        <dt className="text-marine-white/40">Updated</dt>
+                        <dd>{new Date(conditions.value.timestamp).toLocaleString()}</dd>
+                      </dl>
+                    </div>
+                  )}
+                  <LineSeriesChart series={temporalChartSeries} highlightIndex={temporal.value?.best_time_index ?? null} />
+                </>
               )}
             </section>
 
             {/* --- FISHING INTELLIGENCE --------------------------------------- */}
-            <section className="orca-dashboard-area-fishing flex flex-col gap-3 rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-4">
-              <h2 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-marine-cyan-light">
-                <Waves size={13} /> Fishing Intelligence
+            <section className="orca-dashboard-area-fishing flex flex-col gap-4 rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-6">
+              <h2 className="flex items-center gap-1.5 text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">
+                <Waves size={15} /> Fishing Intelligence
               </h2>
               {conditions.kind === "loading" && <SkeletonCard />}
-              {conditions.kind === "error" && <p className="text-xs text-marine-danger">{conditions.message}</p>}
+              {conditions.kind === "error" && <p className="text-sm text-marine-danger">{conditions.message}</p>}
               {conditions.kind === "loaded" && (
                 <>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-semibold text-marine-white">{conditions.value.suitability_score != null ? Math.round(conditions.value.suitability_score * 100) : "—"}</span>
-                    <span className="text-xs text-marine-white/50">/ 100 — ORCA Fishing Suitability</span>
+                  <div className="flex items-baseline gap-3">
+                    <span className="text-5xl font-bold text-marine-white">{conditions.value.suitability_score != null ? Math.round(conditions.value.suitability_score * 100) : "—"}</span>
+                    <span className="text-base text-marine-white/50">/ 100</span>
                   </div>
-                  <p className="text-xs font-medium text-marine-cyan-light">{conditions.value.suitability_category ?? "n/a"}</p>
+                  <span className="w-fit rounded-full border border-marine-cyan/40 bg-marine-cyan/15 px-3 py-1 text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">
+                    {conditions.value.suitability_category ?? "n/a"}
+                  </span>
                   {temporal.kind === "loaded" && temporal.value?.best_time_index != null && (
-                    <p className="text-xs text-marine-white/70">
-                      Best window: {new Date(temporal.value.series[temporal.value.best_time_index].timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    <p className="text-sm text-marine-white/70">
+                      <span className="text-marine-white/40">Best window:</span>{" "}
+                      <span className="font-semibold text-marine-white">
+                        {new Date(temporal.value.series[temporal.value.best_time_index].timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                      </span>
                     </p>
                   )}
                   {conditions.value.risk_factors.length > 0 && (
                     <div>
-                      <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-marine-white/40">Key Factors</p>
-                      <ul className="space-y-1 text-xs text-marine-white/70">
+                      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-marine-white/40">Key Factors</p>
+                      <ul className="space-y-1.5 text-sm text-marine-white/80">
                         {conditions.value.risk_factors.slice(0, 3).map((f) => (
-                          <li key={f.name} className="flex justify-between">
-                            <span>{f.name.replaceAll("_", " ")}</span>
-                            <span>{f.contribution.toFixed(3)}</span>
+                          <li key={f.name} className="flex justify-between border-b border-marine-cyan/5 pb-1.5 last:border-0">
+                            <span className="capitalize">{f.name.replaceAll("_", " ")}</span>
+                            <span className="font-mono text-marine-white">{f.contribution.toFixed(3)}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
                   )}
-                  <p className="text-[10px] italic text-marine-white/40">Not fish abundance, not PFZ detection — a decision-support score only.</p>
-                  <Link to="/fishing" className="text-xs font-medium text-marine-cyan-light underline hover:text-marine-cyan">
+                  <p className="text-xs italic text-marine-white/40">Not fish abundance, not PFZ detection — a decision-support score only.</p>
+                  <ButtonLink to="/fishing" variant="secondary" size="sm" className="w-fit">
                     Open Fishing Intelligence →
-                  </Link>
+                  </ButtonLink>
                 </>
               )}
             </section>
 
             {/* --- ROUTE INTELLIGENCE ------------------------------------------ */}
-            <section className="orca-dashboard-area-route flex flex-col gap-3 rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-4">
-              <h2 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-marine-cyan-light">
-                <Compass size={13} /> Route Intelligence
+            <section className="orca-dashboard-area-route flex flex-col gap-4 rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-6">
+              <h2 className="flex items-center gap-1.5 text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">
+                <Compass size={15} /> Route Intelligence
               </h2>
               {route.kind === "idle" && (
                 <>
-                  <p className="text-xs text-marine-white/60">Calculate a real risk-weighted route from the demo port to this region.</p>
-                  <button type="button" onClick={loadRoute} className="w-fit rounded-full border border-marine-cyan/25 px-3 py-1.5 text-xs font-medium text-marine-cyan-light hover:border-marine-cyan hover:bg-marine-cyan/10">
+                  <p className="text-sm text-marine-white/60">Calculate a real risk-weighted route from the demo port to this region.</p>
+                  <Button variant="secondary" size="sm" onClick={loadRoute} className="w-fit">
                     Calculate Recommended Route
-                  </button>
+                  </Button>
                 </>
               )}
               {route.kind === "loading" && <SkeletonCard lines={2} />}
-              {route.kind === "error" && <p className="text-xs text-marine-danger">{route.message}</p>}
+              {route.kind === "error" && <p className="text-sm text-marine-danger">{route.message}</p>}
               {route.kind === "loaded" && route.data && (
                 <>
-                  <dl className="grid grid-cols-2 gap-2 text-xs text-marine-white/70">
-                    <div>
-                      <dt className="text-marine-white/40">Distance</dt>
-                      <dd>{route.data.metrics.total_distance_km.toFixed(1)} km</dd>
+                  <dl className="grid grid-cols-2 gap-3">
+                    <div className="rounded-xl border border-marine-cyan/10 bg-marine-deep/40 p-3">
+                      <dt className="text-xs text-marine-white/40">Distance</dt>
+                      <dd className="mt-1 text-lg font-semibold text-marine-white">{route.data.metrics.total_distance_km.toFixed(1)} km</dd>
                     </div>
-                    <div>
-                      <dt className="text-marine-white/40">Risk</dt>
-                      <dd>{route.data.risk_level}</dd>
+                    <div className="rounded-xl border border-marine-cyan/10 bg-marine-deep/40 p-3">
+                      <dt className="text-xs text-marine-white/40">Risk</dt>
+                      <dd className="mt-1 text-lg font-semibold text-marine-white">{route.data.risk_level}</dd>
                     </div>
-                    <div>
-                      <dt className="text-marine-white/40">Safety</dt>
-                      <dd>{route.data.safety.outcome}</dd>
+                    <div className="rounded-xl border border-marine-cyan/10 bg-marine-deep/40 p-3">
+                      <dt className="text-xs text-marine-white/40">Safety</dt>
+                      <dd className="mt-1 text-lg font-semibold text-marine-white">{route.data.safety.outcome}</dd>
                     </div>
-                    <div>
-                      <dt className="text-marine-white/40">Alternatives</dt>
-                      <dd>{route.alternatives?.length ?? 0}</dd>
+                    <div className="rounded-xl border border-marine-cyan/10 bg-marine-deep/40 p-3">
+                      <dt className="text-xs text-marine-white/40">Alternatives</dt>
+                      <dd className="mt-1 text-lg font-semibold text-marine-white">{route.alternatives?.length ?? 0}</dd>
                     </div>
                   </dl>
-                  <div className="flex items-center gap-1.5 text-xs text-marine-white/60">
-                    <Anchor size={12} /> Hazards near route: {route.data.hazards_near_route.length}
+                  <div className="flex items-center gap-1.5 text-sm text-marine-white/60">
+                    <Anchor size={13} /> Hazards near route: {route.data.hazards_near_route.length}
                   </div>
                 </>
               )}
-              <Link to="/route-planner" className="text-xs font-medium text-marine-cyan-light underline hover:text-marine-cyan">
+              <ButtonLink to="/route-planner" variant="secondary" size="sm" className="w-fit">
                 View Route Planner →
-              </Link>
+              </ButtonLink>
             </section>
 
             {/* --- DATA & EVIDENCE ------------------------------------------- */}
-            <div className="orca-dashboard-area-evidence">
+            <div className="orca-dashboard-area-evidence flex flex-col gap-6">
+              {safety.kind === "loaded" && <ThunderstormCard hazards={safety.value.hazards} />}
               <EvidenceList title="Data & Evidence" rows={evidenceRows} />
             </div>
           </div>

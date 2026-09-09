@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Clock, Search, Sparkles } from "lucide-react";
 
+import { Button, ButtonLink } from "../components/ui/Button";
+
 import { RouteMap } from "../components/map/RouteMap";
 import { LayerControlPanel, type LayerGroup } from "../components/map/LayerControlPanel";
 import { MapLegend } from "../components/map/MapLegend";
@@ -138,7 +140,7 @@ export function FishingPage() {
         { key: "geofences", label: "Geofences / Restricted Zones", available: true },
       ],
     },
-    { title: "Fishing", layers: [{ key: "pfz", label: "INCOIS PFZ", available: false, unavailableReason: "No verified machine-readable official INCOIS PFZ geometry source is currently integrated." }] },
+    { title: "Fishing", layers: [{ key: "pfz", label: "INCOIS PFZ Reference", available: false, unavailableReason: "No machine-readable official INCOIS PFZ dataset is integrated — see the PFZ Reference card for what is/isn't available." }] },
   ];
   const enabledMap: Record<string, boolean> = { candidates: showCandidates, geofences: showGeofences, pfz: false };
   const toggleLayer = (key: string) => {
@@ -158,15 +160,15 @@ export function FishingPage() {
         <div>
           <p className="text-xs font-medium uppercase tracking-[0.3em] text-marine-cyan-light">Deterministic Decision Support</p>
           <h1 className="mt-4 text-3xl font-semibold tracking-tight text-marine-white sm:text-4xl">Fishing Intelligence.</h1>
-          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-marine-white/70">
+          <p className="mt-4 max-w-3xl text-base leading-relaxed text-marine-white/70">
             ORCA Fishing Suitability is environmental decision support, computed by ORCA's own deterministic engines — it is{" "}
-            <strong>not</strong> fish detection and does not guarantee a catch. Official INCOIS PFZ geometry is not currently available
-            to ORCA; the areas below are ORCA's own independent assessment, never presented as an official PFZ. For
-            what-if scenarios ("what if waves reach 3 metres there?") or the best time to fish across a window, ask{" "}
+            <strong className="text-marine-white">not</strong> fish detection and does not guarantee a catch. It is a separate system
+            from the official INCOIS PFZ advisory (see the PFZ Reference card below). For what-if scenarios ("what if waves reach 3
+            metres there?") or the best time to fish across a window, ask{" "}
             <a href="/ask-orca" className="text-marine-cyan-light underline hover:text-marine-cyan">
               Ask ORCA
             </a>
-            , or use the Time Window panel below for a specific area.
+            , or use the Time Window panel for a specific area.
           </p>
         </div>
 
@@ -182,14 +184,10 @@ export function FishingPage() {
             placeholder='e.g. "Find suitable fishing areas near Mangaluru tomorrow morning"'
             className="flex-1 rounded-full border border-marine-cyan/25 bg-marine-deep/60 px-4 py-2.5 text-sm text-marine-white placeholder:text-marine-white/40 focus:border-marine-cyan focus:outline-none focus-visible:ring-2 focus-visible:ring-marine-cyan"
           />
-          <button
-            type="submit"
-            disabled={asking || !query.trim()}
-            className="flex items-center gap-2 rounded-full bg-marine-cyan px-5 py-2.5 text-sm font-semibold text-marine-deep transition-colors hover:bg-marine-cyan-light disabled:cursor-not-allowed disabled:opacity-50"
-          >
+          <Button type="submit" disabled={asking || !query.trim()} loading={asking}>
             <Search size={15} />
             {asking ? "Asking…" : "Ask ORCA"}
-          </button>
+          </Button>
         </form>
 
         {askResult && (
@@ -201,8 +199,28 @@ export function FishingPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
-          <section className="relative h-[65vh] min-h-[420px] overflow-hidden rounded-2xl border border-marine-cyan/15 lg:h-[70vh]">
+        {/* PFZ REFERENCE — Phase 5: correct, honest terminology. No
+            machine-readable INCOIS PFZ dataset and no reference snapshot
+            file (data/reference/pfz/) exist in this deployment — never
+            fabricated as a live layer or inferred from an image. */}
+        <div className="rounded-2xl border border-marine-cyan/15 bg-marine-ocean/20 p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">INCOIS PFZ Reference</p>
+              <p className="mt-1 text-sm text-marine-white/60">Official Potential Fishing Zone advisory — Indian National Centre for Ocean Information Services (INCOIS).</p>
+            </div>
+            <span className="rounded-full border border-marine-white/25 bg-marine-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-marine-white/70">
+              Reference Snapshot — Unavailable
+            </span>
+          </div>
+          <p className="mt-3 text-xs leading-relaxed text-marine-white/40">
+            No machine-readable INCOIS PFZ dataset is integrated, and no reference snapshot file is present in this deployment. ORCA
+            never infers PFZ coordinates from an advisory image and never labels its own suitability areas below as official PFZ.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_400px]">
+          <section className="relative h-[70vh] min-h-[520px] overflow-hidden rounded-2xl border border-marine-cyan/15">
             <RouteMap
               origin={REGION_CENTER}
               destination={REGION_CENTER}
@@ -228,58 +246,82 @@ export function FishingPage() {
           </section>
 
           <section className="flex flex-col gap-4">
-            <div className="rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-4">
-              <h2 className="text-xs font-semibold uppercase tracking-wide text-marine-cyan-light">Best Available Areas</h2>
-              {candidates.state.kind === "loading" && <p className="mt-3 text-xs text-marine-white/50">Evaluating candidate areas…</p>}
-              {candidates.state.kind === "error" && <p className="mt-3 text-xs text-marine-danger">{candidates.state.message}</p>}
+            <div className="rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-5">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">Best Available Areas</h2>
+              {candidates.state.kind === "loading" && <p className="mt-3 text-sm text-marine-white/50">Evaluating candidate areas…</p>}
+              {candidates.state.kind === "error" && <p className="mt-3 text-sm text-marine-danger">{candidates.state.message}</p>}
               {topAreas.length === 0 && candidates.state.kind === "loaded" && (
-                <p className="mt-3 text-xs text-marine-white/50">No candidate area currently passes ORCA's deterministic safety/risk/suitability checks.</p>
+                <p className="mt-3 text-sm text-marine-white/50">No candidate area currently passes ORCA's deterministic safety/risk/suitability checks.</p>
               )}
-              <div className="mt-3 space-y-2">
+              <div className="mt-4 space-y-3">
                 {topAreas.map((area, i) => (
-                  <button
+                  <div
                     key={i}
-                    type="button"
+                    role="button"
+                    tabIndex={0}
                     onClick={() => setSelected({ layer: "fishing-candidate", properties: area.properties as unknown as Record<string, unknown> })}
-                    className="flex w-full items-center justify-between rounded-lg border border-marine-cyan/15 bg-marine-deep/40 px-3 py-2 text-left text-xs text-marine-white transition-colors hover:border-marine-cyan/40"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") setSelected({ layer: "fishing-candidate", properties: area.properties as unknown as Record<string, unknown> });
+                    }}
+                    className="cursor-pointer rounded-xl border border-marine-cyan/15 bg-marine-deep/40 p-4 text-marine-white transition-colors hover:border-marine-cyan/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marine-cyan"
                   >
-                    <span className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={compareSelection.includes(i)}
-                        onClick={(e) => e.stopPropagation()}
-                        onChange={() => toggleCompareSelection(i)}
-                        className="h-3 w-3 accent-marine-cyan"
-                        aria-label={`Select ${candidateLabel(area, i)} for comparison`}
-                      />
-                      {candidateLabel(area, i)}
-                    </span>
-                    <span className="flex items-center gap-2">
-                      <span className="rounded-full border border-marine-success/40 bg-marine-success/15 px-2 py-0.5 text-marine-success">{area.properties.suitability_category}</span>
-                      <span className="text-marine-white/50">Risk {area.properties.risk_level}</span>
-                      <span
-                        role="button"
-                        tabIndex={0}
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="flex items-center gap-2.5 text-lg font-semibold">
+                        <input
+                          type="checkbox"
+                          checked={compareSelection.includes(i)}
+                          onClick={(e) => e.stopPropagation()}
+                          onChange={() => toggleCompareSelection(i)}
+                          className="h-4 w-4 accent-marine-cyan"
+                          aria-label={`Select ${candidateLabel(area, i)} for comparison`}
+                        />
+                        {candidateLabel(area, i)}
+                      </span>
+                      <button
+                        type="button"
                         title="Show real time-window analysis for this area"
                         onClick={(e) => {
                           e.stopPropagation();
                           const [lon, lat] = area.geometry.coordinates;
                           void loadTemporal(lat, lon);
                         }}
-                        className="rounded-full p-1 text-marine-white/50 hover:bg-marine-cyan/15 hover:text-marine-cyan-light"
+                        className="rounded-full p-1.5 text-marine-white/50 hover:bg-marine-cyan/15 hover:text-marine-cyan-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marine-cyan"
+                        aria-label={`Show time window for ${candidateLabel(area, i)}`}
                       >
-                        <Clock size={12} />
-                      </span>
-                    </span>
-                  </button>
+                        <Clock size={16} />
+                      </button>
+                    </div>
+                    <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <p className="text-xs uppercase tracking-wide text-marine-white/40">Suitability</p>
+                        <p className="mt-0.5 font-semibold text-marine-success">{area.properties.suitability_category}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs uppercase tracking-wide text-marine-white/40">Risk</p>
+                        <p className="mt-0.5 font-semibold text-marine-white">{area.properties.risk_level}</p>
+                      </div>
+                      {area.properties.environmental_context?.wave_height_m != null && (
+                        <div>
+                          <p className="text-xs uppercase tracking-wide text-marine-white/40">Wave</p>
+                          <p className="mt-0.5 text-marine-white/80">{area.properties.environmental_context.wave_height_m.toFixed(2)} m</p>
+                        </div>
+                      )}
+                      {area.properties.distance_km != null && (
+                        <div>
+                          <p className="text-xs uppercase tracking-wide text-marine-white/40">Distance</p>
+                          <p className="mt-0.5 text-marine-white/80">{area.properties.distance_km.toFixed(1)} km</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
 
             {(temporalLoading || temporal) && (
-              <div className="rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-4">
-                <h2 className="text-xs font-semibold uppercase tracking-wide text-marine-cyan-light">Time Window (real hourly forecast)</h2>
-                {temporalLoading && <p className="mt-3 text-xs text-marine-white/50">Evaluating real forecast hours…</p>}
+              <div className="rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-5">
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">Time Window (real hourly forecast)</h2>
+                {temporalLoading && <p className="mt-3 text-sm text-marine-white/50">Evaluating real forecast hours…</p>}
                 {temporal && (
                   <>
                     <div className="mt-3">
@@ -306,7 +348,7 @@ export function FishingPage() {
                         }
                       />
                     </div>
-                    <p className="mt-2 text-[11px] text-marine-white/60">
+                    <p className="mt-2 text-sm text-marine-white/60">
                       {temporal.recommended_index !== null
                         ? `Best available time: ${new Date(temporal.series[temporal.recommended_index].timestamp).toLocaleString()} (highest suitability among hours that passed safety checks).`
                         : "No hour in this window currently passes ORCA's deterministic safety checks."}
@@ -317,16 +359,11 @@ export function FishingPage() {
             )}
 
             {compareSelection.length === 2 && (
-              <div className="rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-4">
-                <h2 className="text-xs font-semibold uppercase tracking-wide text-marine-cyan-light">Compare Areas</h2>
-                <button
-                  type="button"
-                  onClick={runCompare}
-                  disabled={comparing}
-                  className="mt-2 w-full rounded-lg border border-marine-cyan/25 bg-marine-cyan/10 px-3 py-2 text-xs font-medium text-marine-cyan-light hover:bg-marine-cyan/20 disabled:opacity-50"
-                >
+              <div className="rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-5">
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">Compare Areas</h2>
+                <Button variant="secondary" size="sm" onClick={runCompare} disabled={comparing} loading={comparing} className="mt-3 w-full">
                   {comparing ? "Comparing…" : `Compare ${candidateLabel(topAreas[compareSelection[0]], compareSelection[0])} vs ${candidateLabel(topAreas[compareSelection[1]], compareSelection[1])}`}
-                </button>
+                </Button>
                 {compareResult && (
                   <>
                     <ComparisonBarChart
@@ -339,18 +376,15 @@ export function FishingPage() {
                         sublabel: topAreas[i].properties.risk_level ?? undefined,
                       }))}
                     />
-                    <p className="mt-2 text-xs leading-relaxed text-marine-white/80">{compareResult.reason}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-marine-white/80">{compareResult.reason}</p>
                   </>
                 )}
               </div>
             )}
 
-            <a
-              href="/marine-map"
-              className="block rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-4 text-center text-xs font-medium text-marine-cyan-light hover:border-marine-cyan/40"
-            >
+            <ButtonLink to="/marine-map" variant="ghost" size="md" className="w-full">
               View full Marine Intelligence Map →
-            </a>
+            </ButtonLink>
           </section>
         </div>
 

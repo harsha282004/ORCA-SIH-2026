@@ -806,4 +806,38 @@ export async function postScenario(request: ScenarioRequestBody): Promise<Scenar
   return postJson<ScenarioApiResponse>("/api/v1/scenario", request);
 }
 
+// --- POST /api/v1/voice/speak — backend/app/api/v1/voice.py (Phase 9) -----
+//
+// Server-side ElevenLabs synthesis — the API key never reaches this client.
+// A structured 503 (never a 200 with empty/fabricated audio) means voice
+// output is genuinely unavailable in this deployment (no key configured,
+// or a real upstream failure) — callers must render that honestly.
+
+export type VoiceSpeakResult = { kind: "ok"; audioUrl: string } | { kind: "unavailable"; reason: string };
+
+export async function postVoiceSpeak(text: string, language: SupportedLanguage): Promise<VoiceSpeakResult> {
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE_URL}/api/v1/voice/speak`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text, language }),
+    });
+  } catch {
+    return { kind: "unavailable", reason: "ORCA's backend is not reachable right now." };
+  }
+
+  if (!response.ok) {
+    try {
+      const body = await response.json();
+      return { kind: "unavailable", reason: body?.detail?.reason ?? `Voice output failed (HTTP ${response.status}).` };
+    } catch {
+      return { kind: "unavailable", reason: `Voice output failed (HTTP ${response.status}).` };
+    }
+  }
+
+  const blob = await response.blob();
+  return { kind: "ok", audioUrl: URL.createObjectURL(blob) };
+}
+
 export { ApiRequestError };

@@ -8,6 +8,8 @@ import { DataStatusPanel, type StatusRow } from "../components/map/DataStatusPan
 import { buildGeofenceLayer, buildHazardsLayer, type SelectedFeature } from "../components/map/mapLayers";
 import { LineSeriesChart, type ChartSeries } from "../components/charts/LineSeriesChart";
 import { EvidenceList, type EvidenceRow } from "../components/evidence/Evidence";
+import { CycloneCard, ThunderstormCard } from "../components/hazards/HazardIntelCards";
+import { Button } from "../components/ui/Button";
 import { useMapLayer } from "../hooks/useMapLayer";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 import {
@@ -144,7 +146,7 @@ export function SafetyPage() {
         <div>
           <p className="text-xs font-medium uppercase tracking-[0.3em] text-marine-cyan-light">Deterministic Safety Intelligence</p>
           <h1 className="mt-4 text-3xl font-semibold tracking-tight text-marine-white sm:text-4xl">Marine Safety.</h1>
-          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-marine-white/70">
+          <p className="mt-4 max-w-3xl text-base leading-relaxed text-marine-white/70">
             A combined marine safety status, derived entirely from ORCA's existing deterministic Risk Engine, Safety Guard, and Decision
             Engine, plus real detected hazards (active cyclones via GDACS, and wave/wind readings at the Risk Engine's own saturation
             thresholds). ORCA never converts missing hazard data into "safe" — a source that could not be checked is always disclosed below.
@@ -177,43 +179,41 @@ export function SafetyPage() {
               className="mt-1 w-32 rounded-lg border border-marine-cyan/25 bg-marine-deep/60 px-3 py-2 text-sm text-marine-white focus:border-marine-cyan focus:outline-none"
             />
           </label>
-          <button type="submit" className="rounded-full bg-marine-cyan px-5 py-2.5 text-sm font-semibold text-marine-deep transition-colors hover:bg-marine-cyan-light">
-            Check Safety
-          </button>
+          <Button type="submit">Check Safety</Button>
         </form>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_380px]">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_400px]">
           <div className="flex flex-col gap-6">
             {/* --- CURRENT SAFETY STATUS ------------------------------------ */}
-            <section className={`rounded-2xl border p-5 ${LEVEL_STYLE[level].bg}`}>
-              <h2 className="text-xs font-semibold uppercase tracking-wide text-marine-white/60">Current Safety Status</h2>
+            <section className={`rounded-2xl border p-6 ${LEVEL_STYLE[level].bg}`}>
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-white/60">Current Safety Status</h2>
               {status.kind === "loading" && <p className="mt-3 text-sm text-marine-white/50">Evaluating…</p>}
               {status.kind === "error" && <p className="mt-3 text-sm text-marine-danger">{status.message}</p>}
               {status.kind === "loaded" && (
                 <>
-                  <div className={`mt-3 flex items-center gap-3 text-2xl font-semibold ${LEVEL_STYLE[level].text}`}>
-                    <LevelIcon size={26} />
+                  <div className={`mt-3 flex items-center gap-3 text-4xl font-bold ${LEVEL_STYLE[level].text}`}>
+                    <LevelIcon size={36} />
                     {LEVEL_STYLE[level].label}
                   </div>
-                  <p className="mt-2 text-sm leading-relaxed text-marine-white/80">{status.data!.reason}</p>
-                  <dl className="mt-4 grid grid-cols-2 gap-2 text-xs text-marine-white/70 sm:grid-cols-4">
-                    <div>
-                      <dt className="text-marine-white/40">Decision</dt>
-                      <dd>{status.data!.decision_outcome ?? "n/a"}</dd>
+                  <p className="mt-3 text-base leading-relaxed text-marine-white/80">{status.data!.reason}</p>
+                  <dl className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                    <div className="rounded-xl bg-marine-deep/30 p-3">
+                      <dt className="text-xs text-marine-white/40">Decision</dt>
+                      <dd className="mt-1 text-sm font-semibold text-marine-white">{status.data!.decision_outcome ?? "n/a"}</dd>
                     </div>
-                    <div>
-                      <dt className="text-marine-white/40">Safety guard</dt>
-                      <dd>{status.data!.safety_guard_outcome ?? "n/a"}</dd>
+                    <div className="rounded-xl bg-marine-deep/30 p-3">
+                      <dt className="text-xs text-marine-white/40">Safety guard</dt>
+                      <dd className="mt-1 text-sm font-semibold text-marine-white">{status.data!.safety_guard_outcome ?? "n/a"}</dd>
                     </div>
-                    <div>
-                      <dt className="text-marine-white/40">Risk</dt>
-                      <dd>
+                    <div className="rounded-xl bg-marine-deep/30 p-3">
+                      <dt className="text-xs text-marine-white/40">Risk</dt>
+                      <dd className="mt-1 text-sm font-semibold text-marine-white">
                         {status.data!.risk_level ?? "n/a"} ({status.data!.risk_score?.toFixed(3) ?? "n/a"})
                       </dd>
                     </div>
-                    <div>
-                      <dt className="text-marine-white/40">Confidence</dt>
-                      <dd>{status.data!.confidence != null ? `${(status.data!.confidence * 100).toFixed(0)}%` : "n/a"}</dd>
+                    <div className="rounded-xl bg-marine-deep/30 p-3">
+                      <dt className="text-xs text-marine-white/40">Confidence</dt>
+                      <dd className="mt-1 text-sm font-semibold text-marine-white">{status.data!.confidence != null ? `${(status.data!.confidence * 100).toFixed(0)}%` : "n/a"}</dd>
                     </div>
                   </dl>
                 </>
@@ -221,17 +221,12 @@ export function SafetyPage() {
             </section>
 
             {/* --- TEMPORAL SAFETY WINDOW (Phase 7) --------------------------- */}
-            <section className="rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-5">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xs font-semibold uppercase tracking-wide text-marine-cyan-light">Safety Over the Next Few Hours</h2>
-                <button
-                  type="button"
-                  onClick={() => void loadTemporal()}
-                  disabled={temporal.kind === "loading"}
-                  className="rounded-full border border-marine-cyan/25 px-3 py-1 text-[11px] font-medium text-marine-cyan-light transition-colors hover:border-marine-cyan hover:bg-marine-cyan/10 disabled:opacity-50"
-                >
+            <section className="rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-6">
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">Safety Over the Next Few Hours</h2>
+                <Button variant="secondary" size="sm" onClick={() => void loadTemporal()} disabled={temporal.kind === "loading"} loading={temporal.kind === "loading"}>
                   {temporal.kind === "loading" ? "Evaluating…" : "Check real hourly forecast"}
-                </button>
+                </Button>
               </div>
               {temporal.kind === "loaded" && temporal.data && (
                 <>
@@ -259,13 +254,13 @@ export function SafetyPage() {
                       }
                     />
                   </div>
-                  <p className="mt-2 text-[11px] text-marine-white/60">
+                  <p className="mt-2 text-sm text-marine-white/60">
                     {temporal.data.best_time_index !== null
                       ? `Safest real forecast hour: ${new Date(temporal.data.series[temporal.data.best_time_index].timestamp).toLocaleString()} (lowest risk among hours that passed the deterministic Safety Guard).`
                       : "No hour in this window currently passes ORCA's deterministic safety checks."}
                   </p>
                   {temporal.meta?.limitations && (
-                    <ul className="mt-2 list-disc space-y-1 pl-4 text-[10px] italic text-marine-white/40">
+                    <ul className="mt-2 list-disc space-y-1 pl-4 text-xs italic text-marine-white/40">
                       {temporal.meta.limitations.map((l) => (
                         <li key={l}>{l}</li>
                       ))}
@@ -275,8 +270,17 @@ export function SafetyPage() {
               )}
             </section>
 
+            {/* --- CYCLONE / THUNDERSTORM (Phase 6) — the SAME shared cards
+                the Dashboard's Thunderstorm card uses; cyclone detail lives
+                only here since it is location-specific and the Dashboard
+                only surfaces a compact hazards list. --------------------- */}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <CycloneCard hazards={activeHazards} />
+              <ThunderstormCard hazards={activeHazards} />
+            </div>
+
             {/* --- MAP -------------------------------------------------------- */}
-            <section className="relative h-[55vh] min-h-[380px] overflow-hidden rounded-2xl border border-marine-cyan/15">
+            <section className="relative h-[60vh] min-h-[460px] overflow-hidden rounded-2xl border border-marine-cyan/15">
               <RouteMap
                 origin={location}
                 destination={location}
@@ -298,10 +302,10 @@ export function SafetyPage() {
 
           <div className="flex flex-col gap-4">
             {/* --- ACTIVE HAZARDS ---------------------------------------------- */}
-            <section className="rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-4">
-              <h2 className="text-xs font-semibold uppercase tracking-wide text-marine-cyan-light">Active Hazards</h2>
+            <section className="rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-5">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">Active Hazards</h2>
               {activeHazards.length === 0 && status.kind === "loaded" && (
-                <p className="mt-3 text-xs text-marine-white/50">No active hazard detected for this location right now.</p>
+                <p className="mt-3 text-sm text-marine-white/50">No active hazard detected for this location right now.</p>
               )}
               <div className="mt-3 space-y-2">
                 {activeHazards.map((h, i) => (
@@ -309,7 +313,7 @@ export function SafetyPage() {
                     key={i}
                     type="button"
                     onClick={() => setSelected({ layer: "hazard", properties: h as unknown as Record<string, unknown> })}
-                    className="flex w-full items-center justify-between rounded-lg border border-marine-cyan/15 bg-marine-deep/40 px-3 py-2 text-left text-xs text-marine-white transition-colors hover:border-marine-cyan/40"
+                    className="flex w-full items-center justify-between rounded-lg border border-marine-cyan/15 bg-marine-deep/40 px-3.5 py-2.5 text-left text-sm text-marine-white transition-colors hover:border-marine-cyan/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marine-cyan"
                   >
                     <span>{h.title}</span>
                     <span className={`font-semibold ${HAZARD_SEVERITY_TEXT[h.severity] ?? "text-marine-white/60"}`}>{h.severity}</span>
@@ -320,9 +324,9 @@ export function SafetyPage() {
 
             {/* --- RECOMMENDATION ------------------------------------------- */}
             {status.kind === "loaded" && (
-              <section className="rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-4">
-                <h2 className="text-xs font-semibold uppercase tracking-wide text-marine-cyan-light">Recommendation</h2>
-                <p className="mt-2 text-xs leading-relaxed text-marine-white/80">
+              <section className="rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-5">
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">Recommendation</h2>
+                <p className="mt-2 text-sm leading-relaxed text-marine-white/80">
                   {status.data!.decision_outcome === "RECOMMEND" && "Conditions currently pass ORCA's deterministic safety checks."}
                   {status.data!.decision_outcome === "RECOMMEND_WITH_CAUTION" && "Conditions are marginal — proceed with caution and monitor conditions."}
                   {status.data!.decision_outcome === "PROVIDE_ALTERNATIVES" && "Risk is elevated at this exact point — consider an alternative time or location."}
@@ -333,17 +337,17 @@ export function SafetyPage() {
             )}
 
             {/* --- DATA AVAILABILITY ------------------------------------------ */}
-            <section className="rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-4">
-              <h2 className="text-xs font-semibold uppercase tracking-wide text-marine-cyan-light">Data Availability</h2>
-              <div className="mt-3 space-y-2 text-xs">
+            <section className="rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-5">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">Data Availability</h2>
+              <div className="mt-3 space-y-3 text-sm">
                 {(sources ?? []).map((s) => (
-                  <div key={s.hazard_type} className="flex items-start justify-between gap-2 border-b border-marine-cyan/10 pb-2 last:border-0">
+                  <div key={s.hazard_type} className="flex items-start justify-between gap-2 border-b border-marine-cyan/10 pb-3 last:border-0">
                     <div>
                       <p className="font-medium text-marine-white">{s.hazard_type.replaceAll("_", " ")}</p>
-                      <p className="text-[10px] text-marine-white/50">{s.reason}</p>
+                      <p className="text-xs text-marine-white/50">{s.reason}</p>
                     </div>
                     <span
-                      className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${
+                      className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${
                         s.status === "AVAILABLE"
                           ? "border-marine-success/40 text-marine-success"
                           : s.status === "LIMITED"
@@ -357,7 +361,7 @@ export function SafetyPage() {
                 ))}
               </div>
               {unavailable.length > 0 && (
-                <p className="mt-3 text-[10px] italic text-marine-white/40">
+                <p className="mt-3 text-xs italic text-marine-white/40">
                   For THIS specific query: {unavailable.map((u) => u.hazard_type).join(", ")} could not be fully assessed — see reasons above.
                 </p>
               )}

@@ -64,22 +64,27 @@ const STATE_STYLE: Record<DataState, string> = {
 };
 
 export function DataStateBadge({ state }: { state: DataState }) {
-  return <span className={`inline-block rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${STATE_STYLE[state]}`}>{state}</span>;
+  return <span className={`inline-block rounded-full border px-2.5 py-1 text-xs font-semibold uppercase tracking-wide ${STATE_STYLE[state]}`}>{state}</span>;
 }
 
+// Redesign (Phase 11 typography pass) — every size below was raised at
+// least one step: 10px labels -> xs (12px), the primary value 18px -> 24px
+// semibold, card padding 12px -> 20px. Card MIN-HEIGHT is fixed so a grid
+// row of cards never looks jagged when one card has a `details` line and
+// its neighbor doesn't.
 export function EvidenceCard({ row }: { row: EvidenceRow }) {
   const state = deriveDataState(row);
   return (
-    <div className="rounded-xl border border-marine-cyan/15 bg-marine-deep/60 p-3 text-xs">
-      <div className="flex items-start justify-between gap-2">
+    <div className="flex min-h-[168px] flex-col rounded-2xl border border-marine-cyan/15 bg-marine-deep/60 p-5">
+      <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wide text-marine-cyan-light">{row.source}</p>
-          <p className="text-marine-white/70">{row.variable}</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-marine-cyan-light">{row.source}</p>
+          <p className="mt-0.5 text-sm text-marine-white/70">{row.variable}</p>
         </div>
         <DataStateBadge state={state} />
       </div>
-      <p className="mt-2 text-lg font-semibold text-marine-white">{row.value}</p>
-      <dl className="mt-2 space-y-1 text-[10px] text-marine-white/50">
+      <p className="mt-3 text-2xl font-semibold leading-tight text-marine-white">{row.value}</p>
+      <dl className="mt-3 space-y-1.5 text-xs text-marine-white/50">
         {row.timestamp && (
           <div className="flex justify-between gap-2">
             <dt>Updated</dt>
@@ -107,19 +112,19 @@ export function EvidenceCard({ row }: { row: EvidenceRow }) {
           </div>
         )}
       </dl>
-      {row.details && <p className="mt-2 text-[10px] italic leading-relaxed text-marine-white/40">{row.details}</p>}
+      {row.details && <p className="mt-3 text-xs italic leading-relaxed text-marine-white/40">{row.details}</p>}
     </div>
   );
 }
 
 export function EvidenceList({ title, rows }: { title?: string; rows: EvidenceRow[] }) {
   return (
-    <section className="rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-4">
-      {title && <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-marine-cyan-light">{title}</h2>}
+    <section className="rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-6">
+      {title && <h2 className="mb-4 text-base font-semibold uppercase tracking-wide text-marine-cyan-light">{title}</h2>}
       {rows.length === 0 ? (
-        <p className="text-xs text-marine-white/50">No evidence is available for this result.</p>
+        <p className="text-sm text-marine-white/50">No evidence is available for this result.</p>
       ) : (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {rows.map((row, i) => (
             <EvidenceCard key={`${row.source}-${row.variable}-${i}`} row={row} />
           ))}

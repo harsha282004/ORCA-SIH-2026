@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { RouteMap } from "../components/map/RouteMap";
 import { LayerControlPanel, type LayerGroup } from "../components/map/LayerControlPanel";
 import { MapLegend } from "../components/map/MapLegend";
 import { EvidencePanel } from "../components/map/EvidencePanel";
 import { DataStatusPanel, type StatusRow } from "../components/map/DataStatusPanel";
+import { HeatmapControl, type HeatmapOption } from "../components/map/HeatmapControl";
 import { TimeSlider } from "../components/map/TimeSlider";
-import { buildFishingCandidatesLayer, buildHazardsLayer } from "../components/map/mapLayers";
+import { buildFishingCandidatesLayer, buildHazardsLayer, buildHeatmapLayer, heatmapValueExtent, type HeatmapVariable } from "../components/map/mapLayers";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 import { useMapLayer } from "../hooks/useMapLayer";
 import { useMarineLayers } from "../hooks/useMarineLayers";
@@ -65,7 +66,67 @@ export function MarineMapPage() {
   const [showHazards, setShowHazards] = useState(false);
   const hazards = useMapLayer<SafetyHazardsMeta>(showHazards, () => getSafetyHazards(REGION_CENTER.latitude, REGION_CENTER.longitude));
 
+  // --- Phase 12: real spatial heatmap ---------------------------------------
+  // Reuses the SAME oceanography/risk/suitability/chlorophyll fetches
+  // useMarineLayers already performs for the point/polygon layers above —
+  // no second data source, no new endpoint. Selecting a wave/wind/SST
+  // heatmap variable auto-enables the oceanography fetch that already backs
+  // the Waves/Wind/SST point layers, exactly like toggling those checkboxes
+  // would, so there is only ever one live fetch per underlying source.
+  const [heatmapVariable, setHeatmapVariable] = useState<HeatmapVariable | null>(null);
+  useEffect(() => {
+    if (heatmapVariable === "wave_height" || heatmapVariable === "wind_speed" || heatmapVariable === "sst") {
+      if (!marine.enabled.waves && !marine.enabled.wind && !marine.enabled.sst) marine.toggleLayer("waves");
+    } else if (heatmapVariable === "risk" && !marine.enabled.risk) {
+      marine.toggleLayer("risk");
+    } else if (heatmapVariable === "suitability" && !marine.enabled.suitability) {
+      marine.toggleLayer("suitability");
+    } else if (heatmapVariable === "chlorophyll" && !marine.enabled.chlorophyll) {
+      marine.toggleLayer("chlorophyll");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [heatmapVariable]);
+
+  const heatmapSourceState =
+    heatmapVariable === "wave_height" || heatmapVariable === "wind_speed" || heatmapVariable === "sst"
+      ? marine.layers.oceanography.state
+      : heatmapVariable === "risk"
+        ? marine.layers.riskSurface.state
+        : heatmapVariable === "suitability"
+          ? marine.layers.suitability.state
+          : heatmapVariable === "chlorophyll"
+            ? marine.layers.chlorophyll.state
+            : null;
+
+  const heatmapData = heatmapSourceState?.kind === "loaded" ? heatmapSourceState.data : null;
+  const heatmapExtent = useMemo(() => (heatmapData && heatmapVariable ? heatmapValueExtent(heatmapData, heatmapVariable) : null), [heatmapData, heatmapVariable]);
+  const heatmapDeckLayer = useMemo(
+    () => (heatmapData && heatmapVariable && heatmapExtent ? buildHeatmapLayer(heatmapData, heatmapVariable) : null),
+    [heatmapData, heatmapVariable, heatmapExtent],
+  );
+  const heatmapStatus: "idle" | "loading" | "ready" | "unavailable" | "error" = !heatmapVariable
+    ? "idle"
+    : !heatmapSourceState || heatmapSourceState.kind === "loading" || heatmapSourceState.kind === "idle"
+      ? "loading"
+      : heatmapSourceState.kind === "error"
+        ? "error"
+        : heatmapSourceState.kind === "unavailable"
+          ? "unavailable"
+          : heatmapExtent
+            ? "ready"
+            : "unavailable";
+
+  const HEATMAP_OPTIONS: HeatmapOption[] = [
+    { value: "wave_height", label: "Wave Height", unit: "m", available: true },
+    { value: "wind_speed", label: "Wind Speed", unit: "m/s", available: true },
+    { value: "sst", label: "SST", unit: "°C", available: true },
+    { value: "risk", label: "Marine Risk", unit: "score", available: true },
+    { value: "suitability", label: "Fishing Suitability", unit: "score", available: true },
+    { value: "chlorophyll", label: "Chlorophyll-a", unit: "mg/m³", available: true },
+  ];
+
   const allDeckLayers = [...marine.deckLayers];
+  if (heatmapDeckLayer) allDeckLayers.push(heatmapDeckLayer);
   if (showCandidates && candidates.state.kind === "loaded") allDeckLayers.push(buildFishingCandidatesLayer(candidates.state.data, marine.setSelected));
   if (showHazards && hazards.state.kind === "loaded") allDeckLayers.push(buildHazardsLayer(hazards.state.data, marine.setSelected));
 
@@ -152,7 +213,7 @@ export function MarineMapPage() {
         <div>
           <p className="text-xs font-medium uppercase tracking-[0.3em] text-marine-cyan-light">Marine Data Foundation</p>
           <h1 className="mt-4 text-3xl font-semibold tracking-tight text-marine-white sm:text-4xl">Marine Intelligence Map.</h1>
-          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-marine-white/70">
+          <p className="mt-4 max-w-3xl text-base leading-relaxed text-marine-white/70">
             Explore real marine conditions and ORCA's deterministic intelligence across the Mangaluru–Udupi demo region — bathymetry,
             chlorophyll, and SST here are real, acquired samples, not continuous fields; risk and fishing suitability are computed live by
             ORCA's own deterministic engines. To plan a route, use the{" "}
@@ -201,6 +262,14 @@ export function MarineMapPage() {
                 if (showHazards) hazards.refresh();
               }}
               refreshing={marine.refreshing || candidates.state.kind === "loading" || hazards.state.kind === "loading"}
+            />
+            <HeatmapControl
+              options={HEATMAP_OPTIONS}
+              value={heatmapVariable}
+              onChange={setHeatmapVariable}
+              status={heatmapStatus}
+              statusMessage={heatmapSourceState?.kind === "error" ? heatmapSourceState.message : undefined}
+              extent={heatmapExtent}
             />
           </div>
 

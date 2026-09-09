@@ -132,7 +132,7 @@ export function RoutePlannerPage() {
         <section className="flex-shrink-0 lg:w-[380px]">
           <p className="text-xs font-medium uppercase tracking-[0.3em] text-marine-cyan-light">Deterministic Routing</p>
           <h1 className="mt-4 text-3xl font-semibold tracking-tight text-marine-white sm:text-4xl">Plan a route.</h1>
-          <p className="mt-4 text-sm leading-relaxed text-marine-white/70">
+          <p className="mt-4 text-base leading-relaxed text-marine-white/70">
             Risk-aware routing over the Mangaluru–Udupi demo region, backed by real live environmental sampling —
             avoids restricted zones and weighs live risk, never a straight line pretending to be one. To explore
             marine conditions across the whole region, visit the{" "}

@@ -25,14 +25,14 @@ export function ProblemSection() {
           </RevealOnScroll>
 
           <RevealOnScroll delayMs={200}>
-            <ul className="space-y-0 border-t border-marine-cyan/15">
+            <ul className="grid grid-cols-2 gap-3 sm:grid-cols-2">
               {SIGNALS.map((signal, index) => (
                 <li
                   key={signal}
-                  className="flex items-baseline justify-between border-b border-marine-cyan/15 py-4 text-marine-white"
+                  className="rounded-xl border border-marine-cyan/15 bg-marine-deep/30 px-4 py-4 text-marine-white"
                 >
-                  <span className="text-sm text-marine-white/50">{String(index + 1).padStart(2, "0")}</span>
-                  <span className="text-lg font-medium sm:text-xl">{signal}</span>
+                  <span className="text-xs text-marine-cyan-light">{String(index + 1).padStart(2, "0")}</span>
+                  <p className="mt-1 text-base font-medium sm:text-lg">{signal}</p>
                 </li>
               ))}
             </ul>

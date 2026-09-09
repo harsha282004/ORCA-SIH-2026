@@ -75,6 +75,21 @@ class Settings(BaseSettings):
     # Phase 5 orchestration — multi-turn session persistence (architecture.md §31).
     session_ttl_seconds: int = 3600
 
+    # Phase 9 — ElevenLabs text-to-speech for Ask ORCA voice responses.
+    # Never exposed to the frontend; the key stays server-side and is read
+    # only by app.voice.elevenlabs. An empty value (the default — no key is
+    # configured in this deployment) means TTS is genuinely UNAVAILABLE;
+    # the endpoint reports that honestly rather than fabricating audio or
+    # silently pretending the request succeeded.
+    elevenlabs_api_key: str = ""
+    # ElevenLabs' `eleven_multilingual_v2` model is documented to support a
+    # single voice speaking many languages (the model infers pronunciation
+    # from the input text) — one voice ID is used for all three response
+    # languages here rather than one ID per language, since ElevenLabs does
+    # not require (or offer) separate per-language voice IDs for this model.
+    elevenlabs_voice_id: str = ""
+    elevenlabs_model_id: str = "eleven_multilingual_v2"
+
     # PostgreSQL / PostGIS
     postgres_db: str = "orca"
     postgres_user: str = "orca"

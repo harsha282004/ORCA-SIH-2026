@@ -5,6 +5,7 @@
 // geofence membership, or a route — colors/sizes are presentation only,
 // derived from fields the backend already attached.
 import { GeoJsonLayer, ScatterplotLayer, PathLayer } from "@deck.gl/layers";
+import { HeatmapLayer } from "@deck.gl/aggregation-layers";
 import type { PickingInfo } from "@deck.gl/core";
 
 import type { GeoJsonFeatureCollection, RouteCellRef, RouteResultData } from "../../lib/api";
@@ -462,6 +463,128 @@ export function buildAlternativeRoutesLayer(
       if (info.object) onClick({ layer: "route-option", properties: info.object as unknown as Record<string, unknown> });
     },
   });
+}
+
+// --- Real spatial heatmap (Phase 12) ----------------------------------------
+//
+// Built ONLY from the same real, already-fetched multi-point GeoJSON every
+// other layer in this file uses (the oceanography 4x4 grid, the risk/
+// suitability grid, the acquired chlorophyll samples) — never a second
+// data source, never a fabricated point. `HeatmapLayer` (deck.gl's own
+// kernel-density aggregation) visually interpolates BETWEEN real sample
+// points for a continuous-looking surface; it never invents a value AT a
+// point that wasn't sampled — the underlying weighted points are always
+// the genuine per-feature values. A feature collection with zero features
+// (or every point missing the requested variable) yields `null` here, not
+// an empty-looking-but-still-fabricated heatmap.
+
+export type HeatmapVariable = "wave_height" | "wind_speed" | "sst" | "risk" | "suitability" | "chlorophyll";
+
+/** Point geometries use their own coordinates; polygon grid cells (the risk
+ * surface) use their real vertex centroid — a presentation-only geometric
+ * derivation from the polygon's own true boundary, never an invented
+ * location. */
+function featureLngLat(feature: { geometry: { type: string; coordinates: unknown } }): [number, number] | null {
+  const geom = feature.geometry;
+  if (geom.type === "Point") return geom.coordinates as [number, number];
+  if (geom.type === "Polygon") {
+    const ring = (geom.coordinates as [number, number][][])[0];
+    if (!ring || ring.length === 0) return null;
+    const lon = ring.reduce((sum, [x]) => sum + x, 0) / ring.length;
+    const lat = ring.reduce((sum, [, y]) => sum + y, 0) / ring.length;
+    return [lon, lat];
+  }
+  return null;
+}
+
+const HEATMAP_VALUE_FIELD: Record<HeatmapVariable, (props: Record<string, unknown>) => number | null> = {
+  wave_height: (p) => (typeof p.wave_height_m === "number" ? p.wave_height_m : null),
+  wind_speed: (p) => (typeof p.wind_speed_ms === "number" ? p.wind_speed_ms : null),
+  sst: (p) => (typeof p.sea_surface_temperature_c === "number" ? p.sea_surface_temperature_c : null),
+  risk: (p) => (p.navigable === false ? null : typeof p.risk_score === "number" ? p.risk_score : null),
+  suitability: (p) => (typeof p.score === "number" ? p.score : null),
+  chlorophyll: (p) => (typeof p.value === "number" ? p.value : null),
+};
+
+const HEATMAP_COLOR_RANGE: Record<HeatmapVariable, [number, number, number][]> = {
+  // Marine (wave/wind/SST): cool blue -> cyan -> warm, per task's own
+  // "professional marine visualization" palette guidance — never a rainbow.
+  wave_height: [
+    [15, 58, 95],
+    [30, 111, 168],
+    [56, 189, 248],
+    [125, 211, 252],
+    [212, 165, 116],
+  ],
+  wind_speed: [
+    [15, 58, 95],
+    [30, 111, 168],
+    [56, 189, 248],
+    [125, 211, 252],
+    [212, 165, 116],
+  ],
+  sst: [
+    [15, 58, 95],
+    [56, 189, 248],
+    [125, 211, 252],
+    [245, 158, 11],
+  ],
+  // Risk / suitability: green -> yellow -> orange -> red, matching the
+  // rest of the app's own semantic risk coloring — never a novel palette.
+  risk: [
+    [16, 185, 129],
+    [245, 158, 11],
+    [239, 68, 68],
+  ],
+  suitability: [
+    [100, 116, 139],
+    [245, 158, 11],
+    [125, 211, 252],
+    [16, 185, 129],
+  ],
+  chlorophyll: [
+    [240, 240, 200],
+    [125, 180, 90],
+    [30, 90, 16],
+  ],
+};
+
+export function buildHeatmapLayer(data: GeoJsonFeatureCollection, variable: HeatmapVariable) {
+  const getValue = HEATMAP_VALUE_FIELD[variable];
+  const points = data.features
+    .map((f) => {
+      const pos = featureLngLat(f as unknown as { geometry: { type: string; coordinates: unknown } });
+      const value = getValue(f.properties);
+      if (!pos || value == null) return null;
+      return { position: pos, weight: Math.max(value, 0.0001) };
+    })
+    .filter((p): p is { position: [number, number]; weight: number } => p !== null);
+
+  // Never render a heatmap from zero real points — an honest empty layer
+  // (the UI shows "HEATMAP UNAVAILABLE" in this case; see MarineMapPage).
+  if (points.length === 0) return null;
+
+  return new HeatmapLayer({
+    id: `orca-heatmap-${variable}`,
+    data: points,
+    pickable: false,
+    getPosition: (d: { position: [number, number] }) => d.position,
+    getWeight: (d: { weight: number }) => d.weight,
+    radiusPixels: 60,
+    intensity: 1,
+    threshold: 0.03,
+    colorRange: HEATMAP_COLOR_RANGE[variable].map(([r, g, b]) => [r, g, b, 255]) as [number, number, number, number][],
+  });
+}
+
+/** Real min/max of whatever is actually loaded — the heatmap legend's own
+ * range, never a fixed/invented scale (task §"Legend": "Use actual data
+ * ranges... Do not choose ranges simply to make colors look dramatic"). */
+export function heatmapValueExtent(data: GeoJsonFeatureCollection, variable: HeatmapVariable): { min: number; max: number } | null {
+  const getValue = HEATMAP_VALUE_FIELD[variable];
+  const values = data.features.map((f) => getValue(f.properties)).filter((v): v is number => v != null);
+  if (values.length === 0) return null;
+  return { min: Math.min(...values), max: Math.max(...values) };
 }
 
 export function buildCurrentsLayer(data: GeoJsonFeatureCollection, onClick: (f: SelectedFeature) => void) {
