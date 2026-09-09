@@ -12,7 +12,7 @@ type ReadinessState =
   | { kind: "loaded"; data: ReadinessResponse };
 
 function badgeClasses(healthy: boolean | null): string {
-  if (healthy === null) return "bg-marine-white/10 text-marine-white/60";
+  if (healthy === null) return "bg-marine-surface-alt text-marine-ink-muted";
   return healthy ? "bg-marine-success/20 text-marine-success" : "bg-marine-danger/20 text-marine-danger";
 }
 
@@ -20,8 +20,8 @@ function StatusRow({ label, status }: { label: string; status: DependencyStatus 
   const healthy = status === null ? null : status === "healthy";
   const text = status === null ? "unknown" : status;
   return (
-    <div className="flex items-center justify-between border-b border-marine-cyan/10 py-3 last:border-b-0">
-      <span className="text-marine-white">{label}</span>
+    <div className="flex items-center justify-between border-b border-marine-border py-3 last:border-b-0">
+      <span className="text-marine-ink">{label}</span>
       <span className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide ${badgeClasses(healthy)}`}>
         {text}
       </span>
@@ -61,31 +61,31 @@ export function StatusPage() {
   const dependencies = state.kind === "loaded" ? state.data.dependencies : null;
 
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-marine-deep px-4 pt-24 text-marine-white">
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-marine-surface-alt px-4 pt-24 text-marine-ink">
       <div
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(56,189,248,0.08),_transparent_65%)]"
         aria-hidden="true"
       />
       <div className="relative w-full max-w-md">
-        <p className="text-xs font-medium uppercase tracking-[0.3em] text-marine-cyan-light">ORCA System Status</p>
-        <h1 className="mt-3 text-4xl font-bold tracking-tight text-marine-white">ORCA</h1>
-        <p className="mt-1 text-marine-white/60">Marine EcOsystem Reasoning with Collaborative Agents</p>
+        <p className="text-xs font-medium uppercase tracking-[0.3em] text-marine-blue">ORCA System Status</p>
+        <h1 className="mt-3 text-4xl font-bold tracking-tight text-marine-ink">ORCA</h1>
+        <p className="mt-1 text-marine-ink-muted">Marine EcOsystem Reasoning with Collaborative Agents</p>
 
-        <div className="mt-8 rounded-2xl border border-marine-cyan/15 bg-marine-ocean/40 p-5 shadow-sm backdrop-blur-sm">
-          <h2 className="mb-2 text-lg font-semibold text-marine-white">System Status</h2>
+        <div className="mt-8 rounded-2xl border border-marine-border bg-marine-surface p-5 shadow-sm">
+          <h2 className="mb-2 text-lg font-semibold text-marine-ink">System Status</h2>
 
           <StatusRow label="Backend" status={backendReachable ? "healthy" : backendReachable === false ? "unhealthy" : null} />
           <StatusRow label="PostgreSQL" status={dependencies?.database ?? null} />
           <StatusRow label="PostGIS" status={dependencies?.postgis ?? null} />
           <StatusRow label="Redis" status={dependencies?.redis ?? null} />
 
-          {state.kind === "loading" && <p className="pt-3 text-sm text-marine-white/60">Checking backend status...</p>}
+          {state.kind === "loading" && <p className="pt-3 text-sm text-marine-ink-muted">Checking backend status...</p>}
           {state.kind === "unreachable" && (
             <p className="pt-3 text-sm text-marine-danger">Backend unavailable: {state.message}</p>
           )}
         </div>
 
-        <p className="mt-6 text-xs text-marine-white/50">
+        <p className="mt-6 text-xs text-marine-ink-muted">
           Live readiness check against PostgreSQL, PostGIS, and Redis — refreshed every 10 seconds.
         </p>
       </div>

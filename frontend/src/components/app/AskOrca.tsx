@@ -94,10 +94,10 @@ function ResultCard({ data, evidence }: { data?: QueryResponseData | null; evide
   }));
 
   return (
-    <div className="mt-2 space-y-1.5 rounded-lg border border-marine-cyan/10 bg-marine-deep/40 px-3 py-2 text-[11px] text-marine-white/70">
+    <div className="mt-2 space-y-1.5 rounded-lg border border-marine-border bg-marine-surface-alt px-3 py-2 text-[11px] text-marine-ink-muted">
       {top && (
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          <span className="font-semibold text-marine-white/90">Recommended Area</span>
+          <span className="font-semibold text-marine-ink">Recommended Area</span>
           {top.suitability_category && <span>Suitability: {top.suitability_category}</span>}
           {top.risk_level && <span>Risk: {top.risk_level}</span>}
           {typeof top.latitude === "number" && typeof top.longitude === "number" && (
@@ -109,7 +109,7 @@ function ResultCard({ data, evidence }: { data?: QueryResponseData | null; evide
       )}
       {route && (
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          <span className="font-semibold text-marine-white/90">Route {(route as { label?: string }).label ?? ""}</span>
+          <span className="font-semibold text-marine-ink">Route {(route as { label?: string }).label ?? ""}</span>
           <span>{route.metrics.total_distance_km.toFixed(1)} km</span>
           <span>Risk: {(route as { risk_level?: string }).risk_level ?? "—"}</span>
           {data.route_comparison?.recommended_label && <span>ORCA pick: Route {data.route_comparison.recommended_label}</span>}
@@ -117,7 +117,7 @@ function ResultCard({ data, evidence }: { data?: QueryResponseData | null; evide
       )}
       {data.marine_safety && (
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          <span className="font-semibold text-marine-white/90">Marine Safety: {data.marine_safety.level}</span>
+          <span className="font-semibold text-marine-ink">Marine Safety: {data.marine_safety.level}</span>
           <span>
             {data.marine_safety.hazards.length === 0
               ? "No relevant hazards detected from available data."
@@ -135,13 +135,13 @@ function ResultCard({ data, evidence }: { data?: QueryResponseData | null; evide
               { key: "scenario", label: "Scenario", value: scenario.scenario_value, unit: scenario.unit, color: "#F59E0B", sublabel: scenario.scenario_result.decision.outcome.replaceAll("_", " ") },
             ]}
           />
-          <p className="italic text-marine-white/50">{scenario.assumption}</p>
-          {scenario.scope_note && <p className="italic text-marine-white/40">{scenario.scope_note}</p>}
+          <p className="italic text-marine-ink-muted">{scenario.assumption}</p>
+          {scenario.scope_note && <p className="italic text-marine-ink-muted">{scenario.scope_note}</p>}
         </div>
       )}
       {temporal && (
         <div className="space-y-1">
-          <span className="font-semibold text-marine-white/90">
+          <span className="font-semibold text-marine-ink">
             Best time: {temporal.best_time_index !== null ? new Date(temporal.series[temporal.best_time_index].timestamp).toLocaleString() : "none within this window"}
           </span>
           <LineSeriesChart
@@ -303,14 +303,14 @@ export function AskOrca() {
 
   return (
     <div>
-      <div className="overflow-hidden rounded-2xl border border-marine-cyan/15 bg-marine-deep/60 shadow-sm backdrop-blur-sm">
+      <div className="overflow-hidden rounded-2xl border border-marine-border bg-marine-surface shadow-sm">
       {/* --- CHAT HEADER ---------------------------------------------------- */}
-      <div className="flex items-center justify-between border-b border-marine-cyan/10 px-5 py-3 sm:px-6">
+      <div className="flex items-center justify-between border-b border-marine-border px-5 py-3 sm:px-6">
         <div className="flex items-center gap-2.5">
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-marine-cyan/15 text-sm font-semibold text-marine-cyan-light">O</span>
-          <span className="text-sm font-semibold text-marine-white">ORCA Assistant</span>
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-marine-cyan/15 text-sm font-semibold text-marine-blue">O</span>
+          <span className="text-sm font-semibold text-marine-ink">ORCA Assistant</span>
         </div>
-        <span className="flex items-center gap-1.5 text-xs font-medium text-marine-white/60">
+        <span className="flex items-center gap-1.5 text-xs font-medium text-marine-ink-muted">
           <span className={`h-2 w-2 rounded-full ${voiceStatus.dot}`} aria-hidden="true" />
           {voiceStatus.label}
         </span>
@@ -319,7 +319,7 @@ export function AskOrca() {
       {/* --- MESSAGE AREA ---------------------------------------------------- */}
       <div className="max-h-[28rem] space-y-4 overflow-y-auto p-5 sm:p-6" role="log" aria-live="polite">
         {turns.length === 0 && (
-          <p className="text-sm text-marine-white/50">No messages yet — try one of the examples below, or use the microphone.</p>
+          <p className="text-sm text-marine-ink-muted">No messages yet — try one of the examples below, or use the microphone.</p>
         )}
         {turns.map((turn) => (
           <div key={turn.id} className={turn.role === "user" ? "flex justify-end" : "flex justify-start"}>
@@ -328,8 +328,8 @@ export function AskOrca() {
                 turn.role === "user"
                   ? "bg-marine-cyan text-marine-deep"
                   : turn.role === "error"
-                    ? "border border-marine-danger/40 bg-marine-danger/10 text-marine-white"
-                    : "border border-marine-cyan/15 bg-marine-ocean/50 text-marine-white"
+                    ? "border border-marine-danger/40 bg-marine-danger/10 text-marine-ink"
+                    : "border border-marine-border bg-marine-mist text-marine-ink"
               }`}
             >
               <div className="flex items-start justify-between gap-2">
@@ -341,10 +341,10 @@ export function AskOrca() {
                     disabled={voiceLoadingTurnId === turn.id}
                     title={speakingTurnId === turn.id ? "Stop" : "Play ORCA's voice response"}
                     aria-label={speakingTurnId === turn.id ? "Stop voice playback" : "Play voice response"}
-                    className="mt-0.5 shrink-0 rounded-full p-1.5 text-marine-cyan-light transition-colors hover:bg-marine-cyan/15 disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marine-cyan"
+                    className="mt-0.5 shrink-0 rounded-full p-1.5 text-marine-blue transition-colors hover:bg-marine-mist disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marine-cyan"
                   >
                     {voiceLoadingTurnId === turn.id ? (
-                      <span className="block h-3.5 w-3.5 animate-spin rounded-full border-2 border-marine-cyan-light border-t-transparent" />
+                      <span className="block h-3.5 w-3.5 animate-spin rounded-full border-2 border-marine-blue border-t-transparent" />
                     ) : speakingTurnId === turn.id ? (
                       <Square size={14} />
                     ) : (
@@ -353,12 +353,12 @@ export function AskOrca() {
                   </button>
                 )}
               </div>
-              {voiceErrorByTurn[turn.id] && <p className="mt-1.5 text-xs italic text-marine-white/40">Voice output unavailable: {voiceErrorByTurn[turn.id]}</p>}
+              {voiceErrorByTurn[turn.id] && <p className="mt-1.5 text-xs italic text-marine-ink-muted">Voice output unavailable: {voiceErrorByTurn[turn.id]}</p>}
               {(turn.decision || turn.safety || turn.language) && (
                 <div className="mt-2 flex flex-wrap gap-2">
                   {turn.role === "orca" && turn.language && (
                     <span
-                      className="rounded-full border border-marine-cyan/25 bg-marine-cyan/5 px-2 py-0.5 text-[11px] font-medium text-marine-cyan-light"
+                      className="rounded-full border border-marine-blue/25 bg-marine-mist px-2 py-0.5 text-[11px] font-medium text-marine-blue"
                       title="Detected/response language"
                     >
                       {LANGUAGE_LABEL[turn.language] ?? turn.language.toUpperCase()}
@@ -367,20 +367,20 @@ export function AskOrca() {
                   {turn.decision && (
                     <span
                       className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${
-                        DECISION_BADGE_STYLES[turn.decision.outcome] ?? "border-marine-cyan/20 bg-marine-cyan/5 text-marine-white"
+                        DECISION_BADGE_STYLES[turn.decision.outcome] ?? "border-marine-blue/20 bg-marine-mist text-marine-ink"
                       }`}
                     >
                       {turn.decision.outcome.replaceAll("_", " ")}
                     </span>
                   )}
                   {turn.safety && turn.safety.outcome !== "PASS" && (
-                    <span className="rounded-full border border-marine-cyan/20 bg-marine-cyan/5 px-2 py-0.5 text-[11px] font-medium text-marine-white">
+                    <span className="rounded-full border border-marine-blue/20 bg-marine-mist px-2 py-0.5 text-[11px] font-medium text-marine-ink">
                       {turn.safety.outcome.replaceAll("_", " ")}
                     </span>
                   )}
                   {turn.reused && (
                     <span
-                      className="rounded-full border border-marine-white/15 bg-marine-white/5 px-2 py-0.5 text-[11px] font-medium text-marine-white/60"
+                      className="rounded-full border border-marine-border bg-marine-surface-alt px-2 py-0.5 text-[11px] font-medium text-marine-ink-muted"
                       title="Answered from an already-computed result — no new deterministic evaluation was needed"
                     >
                       from earlier result
@@ -392,11 +392,11 @@ export function AskOrca() {
             </div>
           </div>
         ))}
-        {loading && <p className="text-sm text-marine-white/50">ORCA is thinking…</p>}
+        {loading && <p className="text-sm text-marine-ink-muted">ORCA is thinking…</p>}
       </div>
 
       {/* --- INPUT AREA ------------------------------------------------------ */}
-      <div className="border-t border-marine-cyan/10 bg-marine-deep/40 p-4 sm:p-5">
+      <div className="border-t border-marine-border bg-marine-surface-alt p-4 sm:p-5">
         {speech.errorMessage && <p className="mb-2 text-xs italic text-marine-warning">{speech.errorMessage}</p>}
         <form onSubmit={handleSubmit} className="flex items-center gap-2">
           <label htmlFor="ask-orca-input" className="sr-only">
@@ -408,7 +408,7 @@ export function AskOrca() {
             value={input}
             onChange={(event) => setInput(event.target.value)}
             placeholder="Ask ORCA about the ocean… (English, ಕನ್ನಡ, or हिन्दी)"
-            className="flex-1 rounded-full border border-marine-cyan/25 bg-marine-deep/60 px-4 py-2.5 text-sm text-marine-white placeholder:text-marine-white/40 focus:border-marine-cyan focus:outline-none focus-visible:ring-2 focus-visible:ring-marine-cyan"
+            className="flex-1 rounded-full border border-marine-cyan/25 bg-marine-surface px-4 py-2.5 text-sm text-marine-ink placeholder:text-marine-ink-muted focus:border-marine-cyan focus:outline-none focus-visible:ring-2 focus-visible:ring-marine-cyan"
           />
           <button
             type="button"
@@ -427,7 +427,7 @@ export function AskOrca() {
             className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marine-cyan ${
               speech.state === "listening"
                 ? "border-marine-danger bg-marine-danger/20 text-marine-danger"
-                : "border-marine-cyan/25 text-marine-cyan-light hover:border-marine-cyan hover:bg-marine-cyan/10"
+                : "border-marine-blue/30 text-marine-blue hover:border-marine-blue hover:bg-marine-mist"
             } disabled:cursor-not-allowed disabled:opacity-40`}
           >
             <Mic size={16} />
@@ -456,21 +456,21 @@ export function AskOrca() {
               type="button"
               onClick={() => void submitQuery(example)}
               disabled={loading}
-              className="rounded-full border border-marine-cyan/25 px-3 py-1 text-xs text-marine-white/70 transition-colors hover:border-marine-cyan hover:bg-marine-cyan/10 hover:text-marine-white disabled:opacity-50"
+              className="rounded-full border border-marine-border px-3 py-1 text-xs text-marine-ink-muted transition-colors hover:border-marine-blue hover:bg-marine-mist hover:text-marine-ink disabled:opacity-50"
             >
               {example}
             </button>
           ))}
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <label htmlFor="ask-orca-language" className="text-xs text-marine-white/50">
+          <label htmlFor="ask-orca-language" className="text-xs text-marine-ink-muted">
             Response &amp; voice language
           </label>
           <select
             id="ask-orca-language"
             value={languageChoice}
             onChange={(event) => setLanguageChoice(event.target.value as "auto" | SupportedLanguage)}
-            className="rounded-full border border-marine-cyan/25 bg-marine-deep/60 px-3 py-1 text-xs text-marine-white focus:border-marine-cyan focus:outline-none"
+            className="rounded-full border border-marine-border bg-marine-surface px-3 py-1 text-xs text-marine-ink focus:border-marine-cyan focus:outline-none"
           >
             <option value="auto">Auto (detect from query)</option>
             {SUPPORTED_LANGUAGES.map((lang) => (
@@ -479,7 +479,7 @@ export function AskOrca() {
               </option>
             ))}
           </select>
-          <span className="text-xs text-marine-white/30">Voice input needs a specific language selected here.</span>
+          <span className="text-xs text-marine-ink-muted">Voice input needs a specific language selected here.</span>
         </div>
       </div>
     </div>

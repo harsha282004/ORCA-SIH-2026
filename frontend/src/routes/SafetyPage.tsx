@@ -30,18 +30,18 @@ const REGION_CENTER = { latitude: 13.075, longitude: 74.275 };
 
 const LEVEL_STYLE: Record<MarineSafetyLevel, { bg: string; text: string; icon: typeof ShieldCheck; label: string }> = {
   SAFE: { bg: "bg-marine-success/15 border-marine-success/40", text: "text-marine-success", icon: ShieldCheck, label: "Safe" },
-  CAUTION: { bg: "bg-marine-cyan/10 border-marine-cyan/40", text: "text-marine-cyan-light", icon: TriangleAlert, label: "Caution" },
+  CAUTION: { bg: "bg-marine-mist border-marine-blue/40", text: "text-marine-blue", icon: TriangleAlert, label: "Caution" },
   WARNING: { bg: "bg-marine-warning/15 border-marine-warning/40", text: "text-marine-warning", icon: TriangleAlert, label: "Warning" },
   DANGER: { bg: "bg-marine-danger/15 border-marine-danger/40", text: "text-marine-danger", icon: ShieldAlert, label: "Danger" },
-  UNKNOWN: { bg: "bg-marine-white/10 border-marine-white/30", text: "text-marine-white/70", icon: ShieldQuestion, label: "Unknown / Limited" },
+  UNKNOWN: { bg: "bg-marine-surface-alt border-marine-border", text: "text-marine-ink-muted", icon: ShieldQuestion, label: "Unknown / Limited" },
 };
 
 const HAZARD_SEVERITY_TEXT: Record<string, string> = {
-  INFO: "text-marine-white/60",
-  ADVISORY: "text-yellow-400",
+  INFO: "text-marine-ink-muted",
+  ADVISORY: "text-[#92600A]",
   WARNING: "text-marine-warning",
   DANGER: "text-marine-danger",
-  CRITICAL: "text-pink-400",
+  CRITICAL: "text-[#9D174D]",
 };
 
 /**
@@ -141,17 +141,17 @@ export function SafetyPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-marine-deep pt-20">
+    <main className="min-h-screen bg-marine-surface-alt pt-20">
       <div className="mx-auto flex max-w-7xl flex-col gap-6 px-6 py-10 sm:px-10 lg:px-16 lg:py-14">
         <div>
-          <p className="text-xs font-medium uppercase tracking-[0.3em] text-marine-cyan-light">Deterministic Safety Intelligence</p>
-          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-marine-white sm:text-4xl">Marine Safety.</h1>
-          <p className="mt-4 max-w-3xl text-base leading-relaxed text-marine-white/70">
+          <p className="text-xs font-medium uppercase tracking-[0.3em] text-marine-blue">Deterministic Safety Intelligence</p>
+          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-marine-ink sm:text-4xl">Marine Safety.</h1>
+          <p className="mt-4 max-w-3xl text-base leading-relaxed text-marine-ink-muted">
             A combined marine safety status, derived entirely from ORCA's existing deterministic Risk Engine, Safety Guard, and Decision
             Engine, plus real detected hazards (active cyclones via GDACS, and wave/wind readings at the Risk Engine's own saturation
             thresholds). ORCA never converts missing hazard data into "safe" — a source that could not be checked is always disclosed below.
             For what-if scenarios ("would it still be safe if wind increased to 15 m/s?"), ask{" "}
-            <a href="/ask-orca" className="text-marine-cyan-light underline hover:text-marine-cyan">
+            <a href="/ask-orca" className="text-marine-blue underline hover:text-marine-cyan">
               Ask ORCA
             </a>
             .
@@ -159,24 +159,24 @@ export function SafetyPage() {
         </div>
 
         <form onSubmit={handleCheck} className="flex flex-wrap items-end gap-3">
-          <label className="flex flex-col text-xs text-marine-white/60">
+          <label className="flex flex-col text-xs text-marine-ink-muted">
             Latitude
             <input
               type="number"
               step="0.01"
               value={latInput}
               onChange={(e) => setLatInput(e.target.value)}
-              className="mt-1 w-32 rounded-lg border border-marine-cyan/25 bg-marine-deep/60 px-3 py-2 text-sm text-marine-white focus:border-marine-cyan focus:outline-none"
+              className="mt-1 w-32 rounded-lg border border-marine-cyan/25 bg-marine-surface px-3 py-2 text-sm text-marine-ink focus:border-marine-cyan focus:outline-none"
             />
           </label>
-          <label className="flex flex-col text-xs text-marine-white/60">
+          <label className="flex flex-col text-xs text-marine-ink-muted">
             Longitude
             <input
               type="number"
               step="0.01"
               value={lonInput}
               onChange={(e) => setLonInput(e.target.value)}
-              className="mt-1 w-32 rounded-lg border border-marine-cyan/25 bg-marine-deep/60 px-3 py-2 text-sm text-marine-white focus:border-marine-cyan focus:outline-none"
+              className="mt-1 w-32 rounded-lg border border-marine-cyan/25 bg-marine-surface px-3 py-2 text-sm text-marine-ink focus:border-marine-cyan focus:outline-none"
             />
           </label>
           <Button type="submit">Check Safety</Button>
@@ -186,8 +186,8 @@ export function SafetyPage() {
           <div className="flex flex-col gap-6">
             {/* --- CURRENT SAFETY STATUS ------------------------------------ */}
             <section className={`rounded-2xl border p-6 ${LEVEL_STYLE[level].bg}`}>
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-white/60">Current Safety Status</h2>
-              {status.kind === "loading" && <p className="mt-3 text-sm text-marine-white/50">Evaluating…</p>}
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-ink-muted">Current Safety Status</h2>
+              {status.kind === "loading" && <p className="mt-3 text-sm text-marine-ink-muted">Evaluating…</p>}
               {status.kind === "error" && <p className="mt-3 text-sm text-marine-danger">{status.message}</p>}
               {status.kind === "loaded" && (
                 <>
@@ -195,25 +195,25 @@ export function SafetyPage() {
                     <LevelIcon size={36} />
                     {LEVEL_STYLE[level].label}
                   </div>
-                  <p className="mt-3 text-base leading-relaxed text-marine-white/80">{status.data!.reason}</p>
+                  <p className="mt-3 text-base leading-relaxed text-marine-ink-muted">{status.data!.reason}</p>
                   <dl className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                    <div className="rounded-xl bg-marine-deep/30 p-3">
-                      <dt className="text-xs text-marine-white/40">Decision</dt>
-                      <dd className="mt-1 text-sm font-semibold text-marine-white">{status.data!.decision_outcome ?? "n/a"}</dd>
+                    <div className="rounded-xl bg-marine-surface-alt p-3">
+                      <dt className="text-xs text-marine-ink-muted">Decision</dt>
+                      <dd className="mt-1 text-sm font-semibold text-marine-ink">{status.data!.decision_outcome ?? "n/a"}</dd>
                     </div>
-                    <div className="rounded-xl bg-marine-deep/30 p-3">
-                      <dt className="text-xs text-marine-white/40">Safety guard</dt>
-                      <dd className="mt-1 text-sm font-semibold text-marine-white">{status.data!.safety_guard_outcome ?? "n/a"}</dd>
+                    <div className="rounded-xl bg-marine-surface-alt p-3">
+                      <dt className="text-xs text-marine-ink-muted">Safety guard</dt>
+                      <dd className="mt-1 text-sm font-semibold text-marine-ink">{status.data!.safety_guard_outcome ?? "n/a"}</dd>
                     </div>
-                    <div className="rounded-xl bg-marine-deep/30 p-3">
-                      <dt className="text-xs text-marine-white/40">Risk</dt>
-                      <dd className="mt-1 text-sm font-semibold text-marine-white">
+                    <div className="rounded-xl bg-marine-surface-alt p-3">
+                      <dt className="text-xs text-marine-ink-muted">Risk</dt>
+                      <dd className="mt-1 text-sm font-semibold text-marine-ink">
                         {status.data!.risk_level ?? "n/a"} ({status.data!.risk_score?.toFixed(3) ?? "n/a"})
                       </dd>
                     </div>
-                    <div className="rounded-xl bg-marine-deep/30 p-3">
-                      <dt className="text-xs text-marine-white/40">Confidence</dt>
-                      <dd className="mt-1 text-sm font-semibold text-marine-white">{status.data!.confidence != null ? `${(status.data!.confidence * 100).toFixed(0)}%` : "n/a"}</dd>
+                    <div className="rounded-xl bg-marine-surface-alt p-3">
+                      <dt className="text-xs text-marine-ink-muted">Confidence</dt>
+                      <dd className="mt-1 text-sm font-semibold text-marine-ink">{status.data!.confidence != null ? `${(status.data!.confidence * 100).toFixed(0)}%` : "n/a"}</dd>
                     </div>
                   </dl>
                 </>
@@ -221,9 +221,9 @@ export function SafetyPage() {
             </section>
 
             {/* --- TEMPORAL SAFETY WINDOW (Phase 7) --------------------------- */}
-            <section className="rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-6">
+            <section className="rounded-2xl border border-marine-border bg-marine-surface shadow-sm p-6">
               <div className="flex items-center justify-between gap-3">
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">Safety Over the Next Few Hours</h2>
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-blue">Safety Over the Next Few Hours</h2>
                 <Button variant="secondary" size="sm" onClick={() => void loadTemporal()} disabled={temporal.kind === "loading"} loading={temporal.kind === "loading"}>
                   {temporal.kind === "loading" ? "Evaluating…" : "Check real hourly forecast"}
                 </Button>
@@ -254,13 +254,13 @@ export function SafetyPage() {
                       }
                     />
                   </div>
-                  <p className="mt-2 text-sm text-marine-white/60">
+                  <p className="mt-2 text-sm text-marine-ink-muted">
                     {temporal.data.best_time_index !== null
                       ? `Safest real forecast hour: ${new Date(temporal.data.series[temporal.data.best_time_index].timestamp).toLocaleString()} (lowest risk among hours that passed the deterministic Safety Guard).`
                       : "No hour in this window currently passes ORCA's deterministic safety checks."}
                   </p>
                   {temporal.meta?.limitations && (
-                    <ul className="mt-2 list-disc space-y-1 pl-4 text-xs italic text-marine-white/40">
+                    <ul className="mt-2 list-disc space-y-1 pl-4 text-xs italic text-marine-ink-muted">
                       {temporal.meta.limitations.map((l) => (
                         <li key={l}>{l}</li>
                       ))}
@@ -280,7 +280,7 @@ export function SafetyPage() {
             </div>
 
             {/* --- MAP -------------------------------------------------------- */}
-            <section className="relative h-[60vh] min-h-[460px] overflow-hidden rounded-2xl border border-marine-cyan/15">
+            <section className="relative h-[60vh] min-h-[460px] overflow-hidden rounded-2xl border border-marine-border">
               <RouteMap
                 origin={location}
                 destination={location}
@@ -302,10 +302,10 @@ export function SafetyPage() {
 
           <div className="flex flex-col gap-4">
             {/* --- ACTIVE HAZARDS ---------------------------------------------- */}
-            <section className="rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-5">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">Active Hazards</h2>
+            <section className="rounded-2xl border border-marine-border bg-marine-surface shadow-sm p-5">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-blue">Active Hazards</h2>
               {activeHazards.length === 0 && status.kind === "loaded" && (
-                <p className="mt-3 text-sm text-marine-white/50">No active hazard detected for this location right now.</p>
+                <p className="mt-3 text-sm text-marine-ink-muted">No active hazard detected for this location right now.</p>
               )}
               <div className="mt-3 space-y-2">
                 {activeHazards.map((h, i) => (
@@ -313,10 +313,10 @@ export function SafetyPage() {
                     key={i}
                     type="button"
                     onClick={() => setSelected({ layer: "hazard", properties: h as unknown as Record<string, unknown> })}
-                    className="flex w-full items-center justify-between rounded-lg border border-marine-cyan/15 bg-marine-deep/40 px-3.5 py-2.5 text-left text-sm text-marine-white transition-colors hover:border-marine-cyan/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marine-cyan"
+                    className="flex w-full items-center justify-between rounded-lg border border-marine-border bg-marine-surface-alt px-3.5 py-2.5 text-left text-sm text-marine-ink transition-colors hover:border-marine-blue/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marine-cyan"
                   >
                     <span>{h.title}</span>
-                    <span className={`font-semibold ${HAZARD_SEVERITY_TEXT[h.severity] ?? "text-marine-white/60"}`}>{h.severity}</span>
+                    <span className={`font-semibold ${HAZARD_SEVERITY_TEXT[h.severity] ?? "text-marine-ink-muted"}`}>{h.severity}</span>
                   </button>
                 ))}
               </div>
@@ -324,9 +324,9 @@ export function SafetyPage() {
 
             {/* --- RECOMMENDATION ------------------------------------------- */}
             {status.kind === "loaded" && (
-              <section className="rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-5">
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">Recommendation</h2>
-                <p className="mt-2 text-sm leading-relaxed text-marine-white/80">
+              <section className="rounded-2xl border border-marine-border bg-marine-surface shadow-sm p-5">
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-blue">Recommendation</h2>
+                <p className="mt-2 text-sm leading-relaxed text-marine-ink-muted">
                   {status.data!.decision_outcome === "RECOMMEND" && "Conditions currently pass ORCA's deterministic safety checks."}
                   {status.data!.decision_outcome === "RECOMMEND_WITH_CAUTION" && "Conditions are marginal — proceed with caution and monitor conditions."}
                   {status.data!.decision_outcome === "PROVIDE_ALTERNATIVES" && "Risk is elevated at this exact point — consider an alternative time or location."}
@@ -337,14 +337,14 @@ export function SafetyPage() {
             )}
 
             {/* --- DATA AVAILABILITY ------------------------------------------ */}
-            <section className="rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-5">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">Data Availability</h2>
+            <section className="rounded-2xl border border-marine-border bg-marine-surface shadow-sm p-5">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-blue">Data Availability</h2>
               <div className="mt-3 space-y-3 text-sm">
                 {(sources ?? []).map((s) => (
-                  <div key={s.hazard_type} className="flex items-start justify-between gap-2 border-b border-marine-cyan/10 pb-3 last:border-0">
+                  <div key={s.hazard_type} className="flex items-start justify-between gap-2 border-b border-marine-border pb-3 last:border-0">
                     <div>
-                      <p className="font-medium text-marine-white">{s.hazard_type.replaceAll("_", " ")}</p>
-                      <p className="text-xs text-marine-white/50">{s.reason}</p>
+                      <p className="font-medium text-marine-ink">{s.hazard_type.replaceAll("_", " ")}</p>
+                      <p className="text-xs text-marine-ink-muted">{s.reason}</p>
                     </div>
                     <span
                       className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${
@@ -361,7 +361,7 @@ export function SafetyPage() {
                 ))}
               </div>
               {unavailable.length > 0 && (
-                <p className="mt-3 text-xs italic text-marine-white/40">
+                <p className="mt-3 text-xs italic text-marine-ink-muted">
                   For THIS specific query: {unavailable.map((u) => u.hazard_type).join(", ")} could not be fully assessed — see reasons above.
                 </p>
               )}

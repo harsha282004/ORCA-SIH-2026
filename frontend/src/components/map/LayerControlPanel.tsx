@@ -39,31 +39,31 @@ export function LayerControlPanel({ groups, enabled, onToggle, onRefresh, refres
   const activeCount = Object.values(enabled).filter(Boolean).length;
 
   return (
-    <div className="pointer-events-auto w-72 rounded-xl border border-marine-cyan/20 bg-marine-deep/95 text-marine-white shadow-lg backdrop-blur">
+    <div className="pointer-events-auto w-72 rounded-xl border border-marine-border bg-marine-surface text-marine-ink shadow-lg">
       <button
         type="button"
         onClick={() => setCollapsed((c) => !c)}
-        className="flex w-full items-center justify-between px-3.5 py-3 text-sm font-semibold uppercase tracking-wide text-marine-cyan-light"
+        className="flex w-full items-center justify-between px-3.5 py-3 text-sm font-semibold uppercase tracking-wide text-marine-blue"
       >
         <span>
           Map Layers
-          {activeCount > 0 && <span className="ml-2 text-[11px] font-normal normal-case text-marine-white/40">{activeCount} on</span>}
+          {activeCount > 0 && <span className="ml-2 text-[11px] font-normal normal-case text-marine-ink-muted">{activeCount} on</span>}
         </span>
         <ChevronDown size={16} className={`transition-transform ${collapsed ? "-rotate-90" : ""}`} />
       </button>
 
       {!collapsed && (
-        <div className="max-h-[55vh] space-y-4 overflow-y-auto px-3.5 pb-3.5">
+        <div className="max-h-[55vh] space-y-4 overflow-y-auto border-t border-marine-border px-3.5 pb-3.5 pt-3">
           {groups.map((group) => (
             <div key={group.title}>
-              <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-marine-white/40">{group.title}</p>
+              <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-marine-ink-muted">{group.title}</p>
               <div className="space-y-1">
                 {group.layers.map((layer) => (
                   <label
                     key={layer.key}
                     title={layer.available ? undefined : layer.unavailableReason ?? "Not available in this deployment"}
-                    className={`flex items-center gap-2.5 rounded px-1.5 py-1.5 text-sm ${
-                      layer.available ? "cursor-pointer hover:bg-marine-cyan/10" : "cursor-not-allowed opacity-40"
+                    className={`flex items-center gap-2.5 rounded px-1.5 py-1.5 text-sm text-marine-ink ${
+                      layer.available ? "cursor-pointer hover:bg-marine-mist" : "cursor-not-allowed opacity-40"
                     }`}
                   >
                     <input
@@ -71,11 +71,11 @@ export function LayerControlPanel({ groups, enabled, onToggle, onRefresh, refres
                       checked={!!enabled[layer.key]}
                       disabled={!layer.available}
                       onChange={() => layer.available && onToggle(layer.key)}
-                      className="h-4 w-4 accent-marine-cyan"
+                      className="h-4 w-4 accent-marine-blue"
                     />
                     <span>{layer.label}</span>
                     {!layer.available && (
-                      <span className="ml-auto flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-marine-warning/70">
+                      <span className="ml-auto flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-marine-warning">
                         <Lock size={10} /> Locked
                       </span>
                     )}
@@ -89,7 +89,7 @@ export function LayerControlPanel({ groups, enabled, onToggle, onRefresh, refres
             type="button"
             onClick={onRefresh}
             disabled={refreshing}
-            className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg border border-marine-cyan/25 bg-marine-cyan/10 px-3 py-2.5 text-sm font-medium text-marine-cyan-light transition-colors hover:bg-marine-cyan/20 disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg border border-marine-blue/25 bg-marine-mist px-3 py-2.5 text-sm font-medium text-marine-blue transition-colors hover:bg-marine-frost disabled:cursor-not-allowed disabled:opacity-50"
           >
             <RefreshCw size={14} className={refreshing ? "animate-spin" : ""} />
             {refreshing ? "Refreshing…" : "Refresh Data"}

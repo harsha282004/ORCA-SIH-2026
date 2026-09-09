@@ -127,27 +127,27 @@ export function RoutePlannerPage() {
     null;
 
   return (
-    <main className="min-h-screen bg-marine-deep pt-20">
+    <main className="min-h-screen bg-marine-surface-alt pt-20">
       <div className="mx-auto flex max-w-7xl flex-col gap-8 px-6 py-10 sm:px-10 lg:flex-row lg:gap-10 lg:px-16 lg:py-14">
         <section className="flex-shrink-0 lg:w-[380px]">
-          <p className="text-xs font-medium uppercase tracking-[0.3em] text-marine-cyan-light">Deterministic Routing</p>
-          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-marine-white sm:text-4xl">Plan a route.</h1>
-          <p className="mt-4 text-base leading-relaxed text-marine-white/70">
+          <p className="text-xs font-medium uppercase tracking-[0.3em] text-marine-blue">Deterministic Routing</p>
+          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-marine-ink sm:text-4xl">Plan a route.</h1>
+          <p className="mt-4 text-base leading-relaxed text-marine-ink-muted">
             Risk-aware routing over the Mangaluru–Udupi demo region, backed by real live environmental sampling —
             avoids restricted zones and weighs live risk, never a straight line pretending to be one. To explore
             marine conditions across the whole region, visit the{" "}
-            <a href="/marine-map" className="text-marine-cyan-light underline hover:text-marine-cyan">
+            <a href="/marine-map" className="text-marine-blue underline hover:text-marine-cyan">
               Marine Intelligence Map
             </a>
             .
           </p>
 
-          <div className="mt-8 rounded-2xl border border-marine-cyan/15 bg-marine-ocean/40 p-5 backdrop-blur-sm sm:p-6">
+          <div className="mt-8 rounded-2xl border border-marine-border bg-marine-surface p-5 shadow-sm sm:p-6">
             <RoutePlanner onStateChange={handleStateChange} />
           </div>
         </section>
 
-        <section className="relative min-h-[420px] flex-1 overflow-hidden rounded-2xl border border-marine-cyan/15 lg:min-h-[720px]">
+        <section className="relative min-h-[420px] flex-1 overflow-hidden rounded-2xl border border-marine-border lg:min-h-[720px]">
           <RouteMap
             origin={mapState.origin}
             destination={mapState.destination}
@@ -176,19 +176,19 @@ export function RoutePlannerPage() {
           )}
 
           {marine.enabled.bathymetry && marine.layers.bathymetry.state.kind === "unavailable" && (
-            <div className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2 rounded-lg border border-marine-warning/40 bg-marine-deep/95 px-4 py-2 text-xs text-marine-warning shadow-lg">
+            <div className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2 rounded-lg border border-marine-warning/50 bg-marine-surface px-4 py-2 text-xs font-medium text-[#92600A] shadow-lg">
               Bathymetry — DATA INTEGRATION NOT CURRENTLY AVAILABLE ({marine.layers.bathymetry.state.reason})
             </div>
           )}
 
           {marine.enabled.chlorophyll && marine.layers.chlorophyll.state.kind === "unavailable" && (
-            <div className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2 rounded-lg border border-marine-warning/40 bg-marine-deep/95 px-4 py-2 text-xs text-marine-warning shadow-lg">
+            <div className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2 rounded-lg border border-marine-warning/50 bg-marine-surface px-4 py-2 text-xs font-medium text-[#92600A] shadow-lg">
               Chlorophyll — DATA INTEGRATION NOT CURRENTLY AVAILABLE ({marine.layers.chlorophyll.state.reason})
             </div>
           )}
 
           {layerError && (
-            <div className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2 rounded-lg border border-marine-danger/40 bg-marine-deep/95 px-4 py-2 text-xs text-marine-danger shadow-lg">
+            <div className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2 rounded-lg border border-marine-danger/40 bg-marine-surface px-4 py-2 text-xs font-medium text-marine-danger shadow-lg">
               {layerError}
             </div>
           )}

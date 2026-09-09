@@ -27,14 +27,14 @@ const VAR_LABELS: Record<string, string> = { sea_surface_temperature: "SST", wav
 export function TimeSlider({ state, selectedIndex, onChange, point }: TimeSliderProps) {
   if (state.kind === "idle" || state.kind === "loading") {
     return (
-      <div className="pointer-events-auto w-full max-w-xl rounded-xl border border-marine-cyan/20 bg-marine-deep/90 px-4 py-3 text-xs text-marine-white/60 shadow-lg backdrop-blur">
+      <div className="pointer-events-auto w-full max-w-xl rounded-xl border border-marine-border bg-marine-surface px-4 py-3 text-xs text-marine-ink-muted shadow-lg">
         {state.kind === "loading" ? "Loading real hourly forecast series…" : "Enable a time-varying layer to load the time slider."}
       </div>
     );
   }
   if (state.kind === "error") {
     return (
-      <div className="pointer-events-auto w-full max-w-xl rounded-xl border border-marine-danger/40 bg-marine-deep/90 px-4 py-3 text-xs text-marine-danger shadow-lg backdrop-blur">
+      <div className="pointer-events-auto w-full max-w-xl rounded-xl border border-marine-danger/40 bg-marine-surface px-4 py-3 text-xs text-marine-danger shadow-lg">
         Time series unavailable: {state.message}
       </div>
     );
@@ -43,13 +43,13 @@ export function TimeSlider({ state, selectedIndex, onChange, point }: TimeSlider
   const { series } = state;
 
   return (
-    <div className="pointer-events-auto w-full max-w-xl rounded-xl border border-marine-cyan/20 bg-marine-deep/90 px-4 py-3 shadow-lg backdrop-blur">
+    <div className="pointer-events-auto w-full max-w-xl rounded-xl border border-marine-border bg-marine-surface px-4 py-3 shadow-lg">
       <div className="mb-2 flex items-center justify-between text-xs">
-        <span className="flex items-center gap-1.5 font-semibold uppercase tracking-wide text-marine-cyan-light">
+        <span className="flex items-center gap-1.5 font-semibold uppercase tracking-wide text-marine-blue">
           <Clock size={13} />
           Forecast timeline — region reference point
         </span>
-        <span className="text-marine-white/70">{point ? formatHour(point.timestamp) : "—"}</span>
+        <span className="text-marine-ink-muted">{point ? formatHour(point.timestamp) : "—"}</span>
       </div>
 
       <input
@@ -63,21 +63,21 @@ export function TimeSlider({ state, selectedIndex, onChange, point }: TimeSlider
         aria-label="Select forecast hour"
       />
 
-      <div className="mt-1 flex justify-between text-[10px] text-marine-white/40">
+      <div className="mt-1 flex justify-between text-[10px] text-marine-ink-muted">
         <span>{series.length > 0 ? formatHour(series[0].timestamp) : ""}</span>
         <span>{series.length > 0 ? formatHour(series[series.length - 1].timestamp) : ""}</span>
       </div>
 
       {point && (
-        <div className="mt-2 flex flex-wrap gap-3 text-[11px] text-marine-white/70">
+        <div className="mt-2 flex flex-wrap gap-3 text-[11px] text-marine-ink-muted">
           {HEADLINE_VARS.map((v) =>
             typeof point.values[v] === "number" ? (
               <span key={v}>
-                {VAR_LABELS[v]}: <span className="text-marine-white">{point.values[v]!.toFixed(1)}</span> {point.units[v]}
+                {VAR_LABELS[v]}: <span className="text-marine-ink">{point.values[v]!.toFixed(1)}</span> {point.units[v]}
               </span>
             ) : null,
           )}
-          <span className="ml-auto rounded-full border border-marine-cyan/30 bg-marine-cyan/10 px-2 py-0.5 text-marine-cyan-light">FORECAST</span>
+          <span className="ml-auto rounded-full border border-marine-cyan/30 bg-marine-mist px-2 py-0.5 text-marine-blue">FORECAST</span>
         </div>
       )}
     </div>

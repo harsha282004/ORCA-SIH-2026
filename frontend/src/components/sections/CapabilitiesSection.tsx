@@ -36,13 +36,16 @@ const CAPABILITIES = [
   },
 ];
 
+// Theme correction (task §6): explicitly required as WHITE/very light with
+// genuine white cards — was bg-marine-deep with translucent dark-ocean
+// cards, indistinguishable in tone from every section around it.
 export function CapabilitiesSection() {
   return (
-    <section id="capabilities" className="scroll-mt-20 bg-marine-deep px-6 py-28 sm:px-10 sm:py-36 lg:px-16">
+    <section id="capabilities" className="scroll-mt-20 bg-marine-surface-alt px-6 py-28 sm:px-10 sm:py-36 lg:px-16">
       <div className="mx-auto max-w-6xl">
         <RevealOnScroll className="max-w-2xl">
-          <p className="text-xs font-medium uppercase tracking-[0.3em] text-marine-cyan-light">Core Capabilities</p>
-          <h2 className="mt-4 text-3xl font-semibold tracking-tight text-marine-white sm:text-5xl">
+          <p className="text-xs font-medium uppercase tracking-[0.3em] text-marine-blue">Core Capabilities</p>
+          <h2 className="mt-4 text-3xl font-semibold tracking-tight text-marine-ink sm:text-5xl">
             Built on a deterministic core, presented through AI.
           </h2>
         </RevealOnScroll>
@@ -50,10 +53,10 @@ export function CapabilitiesSection() {
         <div className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {CAPABILITIES.map((capability, index) => (
             <RevealOnScroll key={capability.title} delayMs={index * 60}>
-              <div className="h-full rounded-2xl border border-marine-cyan/15 bg-marine-ocean/25 p-6 transition-colors hover:border-marine-cyan/35 hover:bg-marine-ocean/35">
-                <span className="text-sm font-semibold text-marine-cyan-light">{String(index + 1).padStart(2, "0")}</span>
-                <h3 className="mt-3 text-xl font-semibold text-marine-white">{capability.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-marine-white/70">{capability.description}</p>
+              <div className="h-full rounded-2xl border border-marine-border bg-marine-surface p-6 shadow-sm transition-colors hover:border-marine-blue/40 hover:shadow-md">
+                <span className="text-sm font-semibold text-marine-blue">{String(index + 1).padStart(2, "0")}</span>
+                <h3 className="mt-3 text-xl font-semibold text-marine-ink">{capability.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-marine-ink-muted">{capability.description}</p>
               </div>
             </RevealOnScroll>
           ))}

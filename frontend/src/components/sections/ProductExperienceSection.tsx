@@ -24,16 +24,19 @@ const ENTRY_POINTS = [
   },
 ];
 
+// Theme correction: converted to LIGHT so the page alternates after the
+// dark AIIntelligenceSection right above it — white product-entry cards on
+// an off-white section, matching task §16's light-card spec.
 export function ProductExperienceSection() {
   return (
-    <section className="bg-marine-deep px-6 py-28 sm:px-10 sm:py-36 lg:px-16">
+    <section className="bg-marine-surface-alt px-6 py-28 sm:px-10 sm:py-36 lg:px-16">
       <div className="mx-auto max-w-6xl">
         <RevealOnScroll className="max-w-2xl">
-          <p className="text-xs font-medium uppercase tracking-[0.3em] text-marine-cyan-light">The Product Experience</p>
-          <h2 className="mt-4 text-3xl font-semibold tracking-tight text-marine-white sm:text-5xl">
+          <p className="text-xs font-medium uppercase tracking-[0.3em] text-marine-blue">The Product Experience</p>
+          <h2 className="mt-4 text-3xl font-semibold tracking-tight text-marine-ink sm:text-5xl">
             Everything above is the real ORCA.
           </h2>
-          <p className="mt-5 text-sm leading-relaxed text-marine-white/70 sm:text-base">
+          <p className="mt-5 text-sm leading-relaxed text-marine-ink-muted sm:text-base">
             No mockups, no fabricated data — Ask ORCA and Route Planner call ORCA's live backend directly. Open
             either below, or check the system's own health.
           </p>
@@ -44,13 +47,13 @@ export function ProductExperienceSection() {
             <RevealOnScroll key={entry.title} delayMs={index * 80}>
               <Link
                 to={entry.href}
-                className="group block h-full rounded-2xl border border-marine-cyan/15 bg-marine-ocean/25 p-6 transition-colors hover:border-marine-cyan/35 hover:bg-marine-ocean/35"
+                className="group block h-full rounded-2xl border border-marine-border bg-marine-surface p-6 shadow-sm transition-colors hover:border-marine-blue/40 hover:shadow-md"
               >
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-semibold text-marine-white">{entry.title}</h3>
-                  <ArrowUpRight className="h-5 w-5 text-marine-cyan-light/70 transition-colors group-hover:text-marine-cyan-light" strokeWidth={1.75} />
+                  <h3 className="text-xl font-semibold text-marine-ink">{entry.title}</h3>
+                  <ArrowUpRight className="h-5 w-5 text-marine-blue/70 transition-colors group-hover:text-marine-blue" strokeWidth={1.75} />
                 </div>
-                <p className="mt-3 text-sm leading-relaxed text-marine-white/70">{entry.description}</p>
+                <p className="mt-3 text-sm leading-relaxed text-marine-ink-muted">{entry.description}</p>
               </Link>
             </RevealOnScroll>
           ))}

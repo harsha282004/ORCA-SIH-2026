@@ -12,8 +12,8 @@ function Field({ label, value }: { label: string; value: string | number | null 
   if (value === null || value === undefined || value === "") return null;
   return (
     <div className="flex justify-between gap-3 py-0.5">
-      <dt className="text-marine-white/50">{label}</dt>
-      <dd className="text-right text-marine-white">{value}</dd>
+      <dt className="text-marine-ink-muted">{label}</dt>
+      <dd className="text-right text-marine-ink">{value}</dd>
     </div>
   );
 }
@@ -45,12 +45,12 @@ export function EvidencePanel({ feature, onClose }: EvidencePanelProps) {
   const p = feature.properties;
 
   return (
-    <div className="pointer-events-auto w-80 max-w-[90vw] rounded-xl border border-marine-cyan/20 bg-marine-deep/95 p-4 text-sm text-marine-white shadow-xl backdrop-blur">
+    <div className="pointer-events-auto w-80 max-w-[90vw] rounded-xl border border-marine-border bg-marine-surface p-4 text-sm text-marine-ink shadow-xl">
       <div className="mb-2 flex items-center justify-between">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-marine-cyan-light">
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-marine-blue">
           {LAYER_TITLES[feature.layer] ?? feature.layer}
         </h3>
-        <button type="button" onClick={onClose} aria-label="Close evidence panel" className="text-marine-white/50 hover:text-marine-white">
+        <button type="button" onClick={onClose} aria-label="Close evidence panel" className="text-marine-ink-muted hover:text-marine-ink">
           <X size={16} />
         </button>
       </div>
@@ -96,13 +96,13 @@ export function EvidencePanel({ feature, onClose }: EvidencePanelProps) {
           <Field label="PFZ reference" value={p.pfz_reference_status === "unavailable" ? "Not available" : (p.pfz_reference_status as string)} />
           {p.components && typeof p.components === "object" ? (
             <>
-              <p className="mt-2 text-marine-white/50">Supporting factors</p>
+              <p className="mt-2 text-marine-ink-muted">Supporting factors</p>
               {Object.entries(p.components as Record<string, number>).map(([k, v]) => (
                 <Field key={k} label={k.replaceAll("_", " ")} value={v.toFixed(3)} />
               ))}
             </>
           ) : null}
-          <p className="mt-2 text-[10px] italic text-marine-white/40">{p.disclaimer as string}</p>
+          <p className="mt-2 text-[10px] italic text-marine-ink-muted/70">{p.disclaimer as string}</p>
         </dl>
       )}
 
@@ -140,7 +140,7 @@ export function EvidencePanel({ feature, onClose }: EvidencePanelProps) {
         <dl className="text-xs">
           <Field label="Depth" value={typeof p.depth_m === "number" ? `${Math.abs(p.depth_m).toFixed(0)} m ${p.depth_m < 0 ? "below sea level" : "(land)"}` : "no data"} />
           <Field label="TID code" value={typeof p.tid === "number" ? p.tid : null} />
-          <p className="mt-2 text-[10px] italic text-marine-white/40">
+          <p className="mt-2 text-[10px] italic text-marine-ink-muted/70">
             GEBCO_2026 Grid — reference/supporting geospatial data, not a live navigation or safety guarantee.
           </p>
         </dl>
@@ -149,7 +149,7 @@ export function EvidencePanel({ feature, onClose }: EvidencePanelProps) {
       {feature.layer === "chlorophyll" && (
         <dl className="text-xs">
           <Field label="Concentration" value={typeof p.value === "number" ? `${p.value.toFixed(3)} ${(p.unit as string) ?? "mg/m^3"}` : "no data"} />
-          <p className="mt-2 text-[10px] italic text-marine-white/40">
+          <p className="mt-2 text-[10px] italic text-marine-ink-muted/70">
             INCOIS chlorophyll-a concentration — an environmental input to fishing suitability, not a measure of fish abundance.
           </p>
         </dl>
@@ -158,7 +158,7 @@ export function EvidencePanel({ feature, onClose }: EvidencePanelProps) {
       {feature.layer === "incois-sst" && (
         <dl className="text-xs">
           <Field label="Temperature" value={typeof p.value === "number" ? `${p.value.toFixed(2)} ${(p.unit as string) ?? "degC"}` : "no data"} />
-          <p className="mt-2 text-[10px] italic text-marine-white/40">
+          <p className="mt-2 text-[10px] italic text-marine-ink-muted/70">
             A sparse, acquired INCOIS sample (56 points region-wide) — distinct from the live, denser Open-Meteo SST layer. Not a continuous field.
           </p>
         </dl>
@@ -188,7 +188,7 @@ export function EvidencePanel({ feature, onClose }: EvidencePanelProps) {
           {p.reason ? <p className="mt-2 text-marine-warning">{p.reason as string}</p> : null}
           {p.environmental_context && typeof p.environmental_context === "object" ? (
             <>
-              <p className="mt-2 text-marine-white/50">Environmental context (informational — SST is not a suitability input)</p>
+              <p className="mt-2 text-marine-ink-muted">Environmental context (informational — SST is not a suitability input)</p>
               {Object.entries(p.environmental_context as Record<string, number | null>)
                 .filter(([, v]) => v != null)
                 .map(([k, v]) => (
@@ -198,7 +198,7 @@ export function EvidencePanel({ feature, onClose }: EvidencePanelProps) {
           ) : null}
           {Array.isArray(p.risk_factors) && p.risk_factors.length > 0 ? (
             <>
-              <p className="mt-2 text-marine-white/50">Real risk factors (from ORCA Risk Engine)</p>
+              <p className="mt-2 text-marine-ink-muted">Real risk factors (from ORCA Risk Engine)</p>
               {(p.risk_factors as Array<{ name: string; contribution: number }>).map((f) => (
                 <Field key={f.name} label={f.name.replaceAll("_", " ")} value={f.contribution.toFixed(3)} />
               ))}
@@ -206,7 +206,7 @@ export function EvidencePanel({ feature, onClose }: EvidencePanelProps) {
           ) : null}
           {p.active_hazards_checked && Array.isArray(p.active_hazards) ? (
             <>
-              <p className="mt-2 text-marine-white/50">Marine hazards considered (Phase 4)</p>
+              <p className="mt-2 text-marine-ink-muted">Marine hazards considered (Phase 4)</p>
               {(p.active_hazards as Array<{ hazard_type: string; severity: string }>).length === 0 ? (
                 <p className="text-marine-success">No active hazard detected for this candidate.</p>
               ) : (
@@ -216,7 +216,7 @@ export function EvidencePanel({ feature, onClose }: EvidencePanelProps) {
               )}
             </>
           ) : null}
-          <p className="mt-2 text-[10px] italic text-marine-white/40">
+          <p className="mt-2 text-[10px] italic text-marine-ink-muted/70">
             ORCA Fishing Suitability decision support — not fish detection, not a guaranteed catch.
           </p>
         </dl>
@@ -233,7 +233,7 @@ export function EvidencePanel({ feature, onClose }: EvidencePanelProps) {
           <Field label="Observed" value={p.observed_at as string} />
           <Field label="Valid until" value={p.valid_until as string} />
           <Field label="Source" value={p.source as string} />
-          {p.description ? <p className="mt-2 leading-relaxed text-marine-white/70">{p.description as string}</p> : null}
+          {p.description ? <p className="mt-2 leading-relaxed text-marine-ink-muted">{p.description as string}</p> : null}
         </dl>
       )}
 
@@ -264,7 +264,7 @@ export function EvidencePanel({ feature, onClose }: EvidencePanelProps) {
             label="Hazards near route"
             value={Array.isArray(p.hazards_near_route) ? `${p.hazards_near_route.length} detected` : "0 detected"}
           />
-          <p className="mt-2 text-[10px] italic text-marine-white/40">Click "Select" in the Route Options list to make this the active route.</p>
+          <p className="mt-2 text-[10px] italic text-marine-ink-muted/70">Click "Select" in the Route Options list to make this the active route.</p>
         </dl>
       )}
     </div>

@@ -1,10 +1,16 @@
+// Theme correction: FORECAST/STATIC used light-cyan-on-translucent and
+// near-white-on-translucent text, calibrated for a dark glass card — both
+// were functionally invisible once every panel that renders this badge
+// moved to a white/off-white surface. Every status here now uses a
+// solid-enough foreground color to stay readable on marine-surface/
+// marine-surface-alt while keeping each status's own semantic hue.
 const STYLES: Record<string, string> = {
-  CURRENT: "border-marine-success/40 bg-marine-success/15 text-marine-success",
-  FORECAST: "border-marine-cyan/40 bg-marine-cyan/15 text-marine-cyan-light",
-  CACHED: "border-marine-sand/40 bg-marine-sand/15 text-marine-sand",
-  STALE: "border-marine-warning/40 bg-marine-warning/15 text-marine-warning",
-  STATIC: "border-marine-white/25 bg-marine-white/10 text-marine-white/70",
-  UNAVAILABLE: "border-marine-danger/40 bg-marine-danger/15 text-marine-danger",
+  CURRENT: "border-marine-success/40 bg-marine-success/10 text-marine-success",
+  FORECAST: "border-marine-blue/40 bg-marine-mist text-marine-blue",
+  CACHED: "border-marine-sand/60 bg-marine-sand/15 text-[#8A5A2B]",
+  STALE: "border-marine-warning/50 bg-marine-warning/10 text-[#92600A]",
+  STATIC: "border-marine-border bg-marine-surface-alt text-marine-ink-muted",
+  UNAVAILABLE: "border-marine-danger/40 bg-marine-danger/10 text-marine-danger",
 };
 
 /**

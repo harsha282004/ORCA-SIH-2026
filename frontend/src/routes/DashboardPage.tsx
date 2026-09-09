@@ -44,30 +44,30 @@ type FetchState<T> = { kind: "loading" } | { kind: "loaded"; value: T } | { kind
 
 const SAFETY_STYLE: Record<MarineSafetyLevel, { text: string; bg: string; icon: typeof ShieldCheck; label: string }> = {
   SAFE: { text: "text-marine-success", bg: "border-marine-success/40 bg-marine-success/15", icon: ShieldCheck, label: "Safe" },
-  CAUTION: { text: "text-marine-cyan-light", bg: "border-marine-cyan/40 bg-marine-cyan/10", icon: TriangleAlert, label: "Caution" },
+  CAUTION: { text: "text-marine-blue", bg: "border-marine-blue/40 bg-marine-mist", icon: TriangleAlert, label: "Caution" },
   WARNING: { text: "text-marine-warning", bg: "border-marine-warning/40 bg-marine-warning/15", icon: TriangleAlert, label: "Warning" },
   DANGER: { text: "text-marine-danger", bg: "border-marine-danger/40 bg-marine-danger/15", icon: ShieldAlert, label: "Danger" },
   // UNKNOWN must never read as SAFE (task §34) — distinct neutral styling, never green.
-  UNKNOWN: { text: "text-marine-white/70", bg: "border-marine-white/25 bg-marine-white/10", icon: ShieldQuestion, label: "Unknown" },
+  UNKNOWN: { text: "text-marine-ink-muted", bg: "border-marine-border bg-marine-surface-alt", icon: ShieldQuestion, label: "Unknown" },
 };
 
 function ConditionTile({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
-    <div className="rounded-xl border border-marine-cyan/15 bg-marine-deep/60 px-4 py-4">
-      <p className="text-xs font-semibold uppercase tracking-wide text-marine-white/40">{label}</p>
-      <p className="mt-1.5 text-2xl font-semibold text-marine-white">{value}</p>
-      {sub && <p className="mt-0.5 text-xs text-marine-white/50">{sub}</p>}
+    <div className="rounded-xl border border-marine-border bg-marine-surface px-4 py-4 shadow-sm">
+      <p className="text-xs font-semibold uppercase tracking-wide text-marine-ink-muted">{label}</p>
+      <p className="mt-1.5 text-2xl font-semibold text-marine-ink">{value}</p>
+      {sub && <p className="mt-0.5 text-xs text-marine-ink-muted">{sub}</p>}
     </div>
   );
 }
 
 function SkeletonCard({ lines = 3 }: { lines?: number }) {
   return (
-    <div className="animate-pulse rounded-2xl border border-marine-cyan/15 bg-marine-ocean/20 p-4">
-      <div className="h-3 w-1/3 rounded bg-marine-white/10" />
+    <div className="animate-pulse rounded-2xl border border-marine-border bg-marine-surface p-4">
+      <div className="h-3 w-1/3 rounded bg-marine-border" />
       <div className="mt-4 space-y-2">
         {Array.from({ length: lines }).map((_, i) => (
-          <div key={i} className="h-3 rounded bg-marine-white/10" style={{ width: `${80 - i * 15}%` }} />
+          <div key={i} className="h-3 rounded bg-marine-border" style={{ width: `${80 - i * 15}%` }} />
         ))}
       </div>
     </div>
@@ -240,7 +240,7 @@ export function DashboardPage() {
   }, [conditions, safety, temporal]);
 
   return (
-    <main className="min-h-screen bg-marine-deep pt-20">
+    <main className="min-h-screen bg-marine-surface-alt pt-20">
       <div className="mx-auto max-w-7xl px-6 py-10 sm:px-10 lg:px-16 lg:py-14">
         {allFailed ? (
           <div className="flex flex-col items-center gap-4 rounded-2xl border border-marine-danger/40 bg-marine-danger/10 py-16 text-center">
@@ -255,9 +255,9 @@ export function DashboardPage() {
             {/* --- HEADER --------------------------------------------------- */}
             <div className="orca-dashboard-area-header flex flex-wrap items-end justify-between gap-4 pb-2">
               <div>
-                <p className="text-xs font-medium uppercase tracking-[0.3em] text-marine-cyan-light">Marine Intelligence</p>
-                <h1 className="mt-2 text-3xl font-semibold tracking-tight text-marine-white sm:text-4xl">{REGION_LABEL}</h1>
-                <p className="mt-1.5 text-sm text-marine-white/50">
+                <p className="text-xs font-medium uppercase tracking-[0.3em] text-marine-blue">Marine Intelligence</p>
+                <h1 className="mt-2 text-3xl font-semibold tracking-tight text-marine-ink sm:text-4xl">{REGION_LABEL}</h1>
+                <p className="mt-1.5 text-sm text-marine-ink-muted">
                   {safety.kind === "loaded" ? `Updated ${new Date(safety.value.generated_at).toLocaleString()}` : "Updating…"}
                 </p>
               </div>
@@ -273,7 +273,7 @@ export function DashboardPage() {
 
             {/* --- CURRENT CONDITIONS ---------------------------------------- */}
             <section className="orca-dashboard-area-current">
-              <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">Current Conditions</h2>
+              <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-marine-blue">Current Conditions</h2>
               {conditions.kind === "loading" ? (
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
                   {Array.from({ length: 5 }).map((_, i) => (
@@ -307,7 +307,7 @@ export function DashboardPage() {
                 is taller and sits in its own clearly bordered container,
                 never sharing space with the Safety panel (a separate grid
                 cell, task §1's "details must never overlap the map"). */}
-            <section className="orca-dashboard-area-map relative h-[70vh] min-h-[560px] overflow-hidden rounded-2xl border border-marine-cyan/15">
+            <section className="orca-dashboard-area-map relative h-[70vh] min-h-[560px] overflow-hidden rounded-2xl border border-marine-border">
               <RouteMap origin={REGION_CENTER} destination={REGION_CENTER} routeCoordinates={null} reducedMotion={reducedMotion} className="h-full w-full" deckLayers={marine.deckLayers} />
               <div className="pointer-events-none absolute left-3 top-3 flex flex-col gap-3">
                 <LayerControlPanel groups={layerGroups} enabled={marine.enabled} onToggle={(k) => marine.toggleLayer(k as never)} onRefresh={marine.refresh} refreshing={marine.refreshing} />
@@ -321,15 +321,15 @@ export function DashboardPage() {
                 </div>
               )}
               <div className="pointer-events-none absolute bottom-3 left-3">
-                <ButtonLink to="/marine-map" variant="secondary" size="sm" className="pointer-events-auto bg-marine-deep/90">
+                <ButtonLink to="/marine-map" variant="secondary" size="sm" className="pointer-events-auto bg-marine-surface/95">
                   Open full Marine Map →
                 </ButtonLink>
               </div>
             </section>
 
             {/* --- SAFETY ------------------------------------------------------ */}
-            <section className="orca-dashboard-area-safety flex flex-col gap-4 rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-6">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">Marine Safety</h2>
+            <section className="orca-dashboard-area-safety flex flex-col gap-4 rounded-2xl border border-marine-border bg-marine-surface shadow-sm p-6">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-blue">Marine Safety</h2>
               {safety.kind === "loading" && <SkeletonCard />}
               {safety.kind === "error" && <p className="text-sm text-marine-danger">{safety.message}</p>}
               {safety.kind === "loaded" && (
@@ -338,15 +338,15 @@ export function DashboardPage() {
                     <LevelIcon size={24} />
                     {SAFETY_STYLE[level].label}
                   </div>
-                  <p className="text-sm leading-relaxed text-marine-white/70">{safety.value.reason}</p>
+                  <p className="text-sm leading-relaxed text-marine-ink-muted">{safety.value.reason}</p>
                   <div>
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-marine-white/40">Active Hazards</p>
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-marine-ink-muted">Active Hazards</p>
                     {safety.value.hazards.length === 0 ? (
                       <p className="text-sm text-marine-success">No active verified hazards.</p>
                     ) : (
                       <ul className="space-y-2">
                         {safety.value.hazards.map((h, i) => (
-                          <li key={i} className="flex items-center justify-between rounded-lg border border-marine-cyan/10 bg-marine-deep/40 px-3 py-2 text-sm text-marine-white">
+                          <li key={i} className="flex items-center justify-between rounded-lg border border-marine-border bg-marine-surface-alt px-3 py-2 text-sm text-marine-ink">
                             <span>{h.title}</span>
                             <span className="font-semibold text-marine-warning">{h.severity}</span>
                           </li>
@@ -354,7 +354,7 @@ export function DashboardPage() {
                       </ul>
                     )}
                     {safety.value.unavailable_sources.length > 0 && (
-                      <p className="mt-2 text-xs italic text-marine-white/40">
+                      <p className="mt-2 text-xs italic text-marine-ink-muted">
                         Hazard data unavailable: {safety.value.unavailable_sources.map((u) => u.hazard_type).join(", ")}.
                       </p>
                     )}
@@ -374,11 +374,11 @@ export function DashboardPage() {
                 Updated block below), the line is genuinely, honestly flat;
                 see docs report §2 for the live values checked before this
                 redesign. */}
-            <section className="orca-dashboard-area-temporal rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-6">
+            <section className="orca-dashboard-area-temporal rounded-2xl border border-marine-border bg-marine-surface shadow-sm p-6">
               <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">Marine Conditions — Temporal</h2>
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-blue">Marine Conditions — Temporal</h2>
                 {temporal.kind === "loaded" && temporal.value && (
-                  <span className="text-xs text-marine-white/40">Real hourly Open-Meteo forecast — never smoothed or extrapolated.</span>
+                  <span className="text-xs text-marine-ink-muted">Real hourly Open-Meteo forecast — never smoothed or extrapolated.</span>
                 )}
               </div>
               {temporal.kind === "loading" ? (
@@ -388,20 +388,20 @@ export function DashboardPage() {
               ) : (
                 <>
                   {conditions.kind === "loaded" && conditions.value.environmental_context?.wave_height_m != null && (
-                    <div className="mb-4 flex flex-wrap items-end justify-between gap-4 border-b border-marine-cyan/10 pb-4">
+                    <div className="mb-4 flex flex-wrap items-end justify-between gap-4 border-b border-marine-border pb-4">
                       <div>
-                        <p className="text-xs font-semibold uppercase tracking-wide text-marine-white/40">Wave Height</p>
-                        <p className="mt-1 text-3xl font-semibold text-marine-white">{conditions.value.environmental_context.wave_height_m.toFixed(2)} m</p>
-                        <span className="mt-1 inline-block rounded-full border border-marine-cyan/40 bg-marine-cyan/15 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-marine-cyan-light">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-marine-ink-muted">Wave Height</p>
+                        <p className="mt-1 text-3xl font-semibold text-marine-ink">{conditions.value.environmental_context.wave_height_m.toFixed(2)} m</p>
+                        <span className="mt-1 inline-block rounded-full border border-marine-cyan/40 bg-marine-cyan/15 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-marine-blue">
                           Forecast
                         </span>
                       </div>
-                      <dl className="grid grid-cols-2 gap-x-6 gap-y-1 text-xs text-marine-white/60">
-                        <dt className="text-marine-white/40">Source</dt>
+                      <dl className="grid grid-cols-2 gap-x-6 gap-y-1 text-xs text-marine-ink-muted">
+                        <dt className="text-marine-ink-muted">Source</dt>
                         <dd>Open-Meteo Marine</dd>
-                        <dt className="text-marine-white/40">Data Type</dt>
+                        <dt className="text-marine-ink-muted">Data Type</dt>
                         <dd>Forecast (hourly)</dd>
-                        <dt className="text-marine-white/40">Updated</dt>
+                        <dt className="text-marine-ink-muted">Updated</dt>
                         <dd>{new Date(conditions.value.timestamp).toLocaleString()}</dd>
                       </dl>
                     </div>
@@ -412,8 +412,8 @@ export function DashboardPage() {
             </section>
 
             {/* --- FISHING INTELLIGENCE --------------------------------------- */}
-            <section className="orca-dashboard-area-fishing flex flex-col gap-4 rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-6">
-              <h2 className="flex items-center gap-1.5 text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">
+            <section className="orca-dashboard-area-fishing flex flex-col gap-4 rounded-2xl border border-marine-border bg-marine-surface shadow-sm p-6">
+              <h2 className="flex items-center gap-1.5 text-sm font-semibold uppercase tracking-wide text-marine-blue">
                 <Waves size={15} /> Fishing Intelligence
               </h2>
               {conditions.kind === "loading" && <SkeletonCard />}
@@ -421,34 +421,34 @@ export function DashboardPage() {
               {conditions.kind === "loaded" && (
                 <>
                   <div className="flex items-baseline gap-3">
-                    <span className="text-5xl font-bold text-marine-white">{conditions.value.suitability_score != null ? Math.round(conditions.value.suitability_score * 100) : "—"}</span>
-                    <span className="text-base text-marine-white/50">/ 100</span>
+                    <span className="text-5xl font-bold text-marine-ink">{conditions.value.suitability_score != null ? Math.round(conditions.value.suitability_score * 100) : "—"}</span>
+                    <span className="text-base text-marine-ink-muted">/ 100</span>
                   </div>
-                  <span className="w-fit rounded-full border border-marine-cyan/40 bg-marine-cyan/15 px-3 py-1 text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">
+                  <span className="w-fit rounded-full border border-marine-cyan/40 bg-marine-cyan/15 px-3 py-1 text-sm font-semibold uppercase tracking-wide text-marine-blue">
                     {conditions.value.suitability_category ?? "n/a"}
                   </span>
                   {temporal.kind === "loaded" && temporal.value?.best_time_index != null && (
-                    <p className="text-sm text-marine-white/70">
-                      <span className="text-marine-white/40">Best window:</span>{" "}
-                      <span className="font-semibold text-marine-white">
+                    <p className="text-sm text-marine-ink-muted">
+                      <span className="text-marine-ink-muted">Best window:</span>{" "}
+                      <span className="font-semibold text-marine-ink">
                         {new Date(temporal.value.series[temporal.value.best_time_index].timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                       </span>
                     </p>
                   )}
                   {conditions.value.risk_factors.length > 0 && (
                     <div>
-                      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-marine-white/40">Key Factors</p>
-                      <ul className="space-y-1.5 text-sm text-marine-white/80">
+                      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-marine-ink-muted">Key Factors</p>
+                      <ul className="space-y-1.5 text-sm text-marine-ink-muted">
                         {conditions.value.risk_factors.slice(0, 3).map((f) => (
-                          <li key={f.name} className="flex justify-between border-b border-marine-cyan/5 pb-1.5 last:border-0">
+                          <li key={f.name} className="flex justify-between border-b border-marine-border pb-1.5 last:border-0">
                             <span className="capitalize">{f.name.replaceAll("_", " ")}</span>
-                            <span className="font-mono text-marine-white">{f.contribution.toFixed(3)}</span>
+                            <span className="font-mono text-marine-ink">{f.contribution.toFixed(3)}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
                   )}
-                  <p className="text-xs italic text-marine-white/40">Not fish abundance, not PFZ detection — a decision-support score only.</p>
+                  <p className="text-xs italic text-marine-ink-muted">Not fish abundance, not PFZ detection — a decision-support score only.</p>
                   <ButtonLink to="/fishing" variant="secondary" size="sm" className="w-fit">
                     Open Fishing Intelligence →
                   </ButtonLink>
@@ -457,13 +457,13 @@ export function DashboardPage() {
             </section>
 
             {/* --- ROUTE INTELLIGENCE ------------------------------------------ */}
-            <section className="orca-dashboard-area-route flex flex-col gap-4 rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-6">
-              <h2 className="flex items-center gap-1.5 text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">
+            <section className="orca-dashboard-area-route flex flex-col gap-4 rounded-2xl border border-marine-border bg-marine-surface shadow-sm p-6">
+              <h2 className="flex items-center gap-1.5 text-sm font-semibold uppercase tracking-wide text-marine-blue">
                 <Compass size={15} /> Route Intelligence
               </h2>
               {route.kind === "idle" && (
                 <>
-                  <p className="text-sm text-marine-white/60">Calculate a real risk-weighted route from the demo port to this region.</p>
+                  <p className="text-sm text-marine-ink-muted">Calculate a real risk-weighted route from the demo port to this region.</p>
                   <Button variant="secondary" size="sm" onClick={loadRoute} className="w-fit">
                     Calculate Recommended Route
                   </Button>
@@ -474,24 +474,24 @@ export function DashboardPage() {
               {route.kind === "loaded" && route.data && (
                 <>
                   <dl className="grid grid-cols-2 gap-3">
-                    <div className="rounded-xl border border-marine-cyan/10 bg-marine-deep/40 p-3">
-                      <dt className="text-xs text-marine-white/40">Distance</dt>
-                      <dd className="mt-1 text-lg font-semibold text-marine-white">{route.data.metrics.total_distance_km.toFixed(1)} km</dd>
+                    <div className="rounded-xl border border-marine-border bg-marine-surface-alt p-3">
+                      <dt className="text-xs text-marine-ink-muted">Distance</dt>
+                      <dd className="mt-1 text-lg font-semibold text-marine-ink">{route.data.metrics.total_distance_km.toFixed(1)} km</dd>
                     </div>
-                    <div className="rounded-xl border border-marine-cyan/10 bg-marine-deep/40 p-3">
-                      <dt className="text-xs text-marine-white/40">Risk</dt>
-                      <dd className="mt-1 text-lg font-semibold text-marine-white">{route.data.risk_level}</dd>
+                    <div className="rounded-xl border border-marine-border bg-marine-surface-alt p-3">
+                      <dt className="text-xs text-marine-ink-muted">Risk</dt>
+                      <dd className="mt-1 text-lg font-semibold text-marine-ink">{route.data.risk_level}</dd>
                     </div>
-                    <div className="rounded-xl border border-marine-cyan/10 bg-marine-deep/40 p-3">
-                      <dt className="text-xs text-marine-white/40">Safety</dt>
-                      <dd className="mt-1 text-lg font-semibold text-marine-white">{route.data.safety.outcome}</dd>
+                    <div className="rounded-xl border border-marine-border bg-marine-surface-alt p-3">
+                      <dt className="text-xs text-marine-ink-muted">Safety</dt>
+                      <dd className="mt-1 text-lg font-semibold text-marine-ink">{route.data.safety.outcome}</dd>
                     </div>
-                    <div className="rounded-xl border border-marine-cyan/10 bg-marine-deep/40 p-3">
-                      <dt className="text-xs text-marine-white/40">Alternatives</dt>
-                      <dd className="mt-1 text-lg font-semibold text-marine-white">{route.alternatives?.length ?? 0}</dd>
+                    <div className="rounded-xl border border-marine-border bg-marine-surface-alt p-3">
+                      <dt className="text-xs text-marine-ink-muted">Alternatives</dt>
+                      <dd className="mt-1 text-lg font-semibold text-marine-ink">{route.alternatives?.length ?? 0}</dd>
                     </div>
                   </dl>
-                  <div className="flex items-center gap-1.5 text-sm text-marine-white/60">
+                  <div className="flex items-center gap-1.5 text-sm text-marine-ink-muted">
                     <Anchor size={13} /> Hazards near route: {route.data.hazards_near_route.length}
                   </div>
                 </>

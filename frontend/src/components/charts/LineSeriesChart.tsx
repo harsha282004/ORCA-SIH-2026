@@ -69,7 +69,7 @@ export function LineSeriesChart({
   const nonEmpty = series.filter((s) => s.points.some((p) => p.value !== null));
   if (nonEmpty.length === 0) {
     return (
-      <div style={{ height }} className="flex flex-col items-center justify-center rounded-lg border border-dashed border-marine-white/15 text-xs text-marine-white/40">
+      <div style={{ height }} className="flex flex-col items-center justify-center rounded-lg border border-dashed border-marine-border text-xs text-marine-ink-muted">
         <span className="font-semibold uppercase tracking-wide">{emptyLabel}</span>
         <span className="mt-1 text-[10px]">No real temporal data exists for this variable/location.</span>
       </div>
@@ -126,8 +126,8 @@ export function LineSeriesChart({
         {/* Gridlines + y-axis labels — real min/mid/max of the actual data, never round-number invention. */}
         {yTicks.map((t, i) => (
           <g key={i}>
-            <line x1={PADDING.left} x2={width - PADDING.right} y1={y(t)} y2={y(t)} stroke="#F8FAFC" strokeOpacity={0.08} />
-            <text x={PADDING.left - 6} y={y(t)} textAnchor="end" dominantBaseline="middle" fontSize={9} fill="#F8FAFC" fillOpacity={0.4}>
+            <line x1={PADDING.left} x2={width - PADDING.right} y1={y(t)} y2={y(t)} stroke="#0B2B45" strokeOpacity={0.08} />
+            <text x={PADDING.left - 6} y={y(t)} textAnchor="end" dominantBaseline="middle" fontSize={9} fill="#4B6478">
               {t.toFixed(1)}
             </text>
           </g>
@@ -146,7 +146,7 @@ export function LineSeriesChart({
         {labelSeries.points.map((p, i) => {
           if (pointCount > 8 && i % 2 !== 0) return null;
           return (
-            <text key={p.timestamp} x={x(i)} y={height - 8} textAnchor="middle" fontSize={9} fill="#F8FAFC" fillOpacity={0.4}>
+            <text key={p.timestamp} x={x(i)} y={height - 8} textAnchor="middle" fontSize={9} fill="#4B6478">
               {xLabel(p, i)}
             </text>
           );
@@ -170,14 +170,14 @@ export function LineSeriesChart({
           nonEmpty.map((s) => {
             const p = s.points[hoverIndex];
             if (!p || p.value === null) return null;
-            return <circle key={s.key} cx={x(hoverIndex)} cy={y(p.value)} r={3.5} fill={s.color} stroke="#0A2540" strokeWidth={1.5} />;
+            return <circle key={s.key} cx={x(hoverIndex)} cy={y(p.value)} r={3.5} fill={s.color} stroke="#FFFFFF" strokeWidth={1.5} />;
           })}
       </svg>
 
       <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-wrap gap-3">
           {series.map((s) => (
-            <span key={s.key} className="flex items-center gap-1.5 text-[10px] text-marine-white/60">
+            <span key={s.key} className="flex items-center gap-1.5 text-[10px] text-marine-ink-muted">
               <span className="inline-block h-0.5 w-3 rounded-full" style={{ backgroundColor: s.color }} />
               {s.label}
               {s.unit ? ` (${s.unit})` : ""}
@@ -185,8 +185,8 @@ export function LineSeriesChart({
           ))}
         </div>
         {hoverPoint && (
-          <div className="rounded-md border border-marine-cyan/20 bg-marine-deep/95 px-2 py-1 text-[10px] text-marine-white">
-            <span className="text-marine-cyan-light">{tooltipXLabel(hoverPoint, hoverIndex!)}</span>
+          <div className="rounded-md border border-marine-border bg-marine-surface px-2 py-1 text-[10px] text-marine-ink shadow-sm">
+            <span className="text-marine-blue">{tooltipXLabel(hoverPoint, hoverIndex!)}</span>
             {nonEmpty.map((s) => {
               const p = s.points[hoverIndex!];
               if (!p || p.value === null) return null;

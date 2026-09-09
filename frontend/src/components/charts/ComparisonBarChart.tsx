@@ -24,7 +24,7 @@ const DEFAULT_COLORS = ["#38BDF8", "#F59E0B", "#7DD3FC", "#10B981"];
 export function ComparisonBarChart({ groups, height = 160, emptyLabel = "DATA UNAVAILABLE" }: ComparisonBarChartProps) {
   if (groups.length === 0) {
     return (
-      <div style={{ height }} className="flex items-center justify-center rounded-lg border border-dashed border-marine-white/15 text-xs font-semibold uppercase tracking-wide text-marine-white/40">
+      <div style={{ height }} className="flex items-center justify-center rounded-lg border border-dashed border-marine-border text-xs font-semibold uppercase tracking-wide text-marine-ink-muted">
         {emptyLabel}
       </div>
     );
@@ -46,16 +46,16 @@ export function ComparisonBarChart({ groups, height = 160, emptyLabel = "DATA UN
           const color = g.color ?? DEFAULT_COLORS[i % DEFAULT_COLORS.length];
           return (
             <g key={g.key}>
-              <rect x={cx - barWidth / 2} y={barY} width={barWidth} height={Math.max(barHeight, 1)} rx={3} fill={color} fillOpacity={0.85} />
-              <text x={cx} y={barY - 6} textAnchor="middle" fontSize={11} fontWeight={600} fill="#F8FAFC">
+              <rect x={cx - barWidth / 2} y={barY} width={barWidth} height={Math.max(barHeight, 1)} rx={3} fill={color} fillOpacity={0.9} />
+              <text x={cx} y={barY - 6} textAnchor="middle" fontSize={11} fontWeight={600} fill="#0B2B45">
                 {g.value.toFixed(2)}
                 {g.unit ? ` ${g.unit}` : ""}
               </text>
-              <text x={cx} y={height - 24} textAnchor="middle" fontSize={10} fill="#F8FAFC" fillOpacity={0.75}>
+              <text x={cx} y={height - 24} textAnchor="middle" fontSize={10} fill="#4B6478">
                 {g.label}
               </text>
               {g.sublabel && (
-                <text x={cx} y={height - 10} textAnchor="middle" fontSize={9} fill="#F8FAFC" fillOpacity={0.45}>
+                <text x={cx} y={height - 10} textAnchor="middle" fontSize={9} fill="#4B6478" fillOpacity={0.8}>
                   {g.sublabel}
                 </text>
               )}

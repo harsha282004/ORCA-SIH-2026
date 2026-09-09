@@ -27,16 +27,31 @@ export default {
         // and its immediate chrome (Footer, mobile nav) keep the original
         // dark-teal "orca-deep" untouched; this is a second, later stop on
         // the same warm-sunset-to-deep-blue journey, not a replacement of it.
-        "marine-deep": "#0A2540", // primary background — deep ocean
-        "marine-ocean": "#0F3A5F", // secondary surfaces / sections
+        "marine-deep": "#0A2540", // primary DARK background — navbar, footer, deliberately-dark sections
+        "marine-ocean": "#0F3A5F", // secondary DARK surface — cards/panels inside a dark section
         "marine-blue": "#1E6FA8", // mid-depth accent, gradient stop
-        "marine-cyan": "#38BDF8", // primary interactive accent
-        "marine-cyan-light": "#7DD3FC", // secondary highlights / icons / active states
-        "marine-white": "#F8FAFC", // primary text on deep-marine surfaces
+        "marine-cyan": "#38BDF8", // primary interactive accent — reads on both light and dark surfaces
+        "marine-cyan-light": "#7DD3FC", // secondary highlights / icons / active states (dark-surface use only — too low-contrast for body text on white)
+        "marine-white": "#F8FAFC", // primary text color ON dark-marine surfaces only
         "marine-sand": "#D4A574", // very subtle warm coastal accent — used sparingly
         "marine-success": "#10B981",
         "marine-warning": "#F59E0B",
         "marine-danger": "#EF4444",
+
+        // Light-surface system (theme correction) — every app page and every
+        // OTHER-than-deliberately-dark landing section uses these, never
+        // "marine-deep"/"marine-ocean" as a full-page background. This is
+        // what actually produces the light/dark RHYTHM the reference calls
+        // for — before this, "marine-deep" was the only page background
+        // that existed anywhere past the hero, which is the entire reason
+        // the rendered app read as "dark blue everywhere."
+        "marine-surface": "#FFFFFF", // card/panel background on a light section
+        "marine-surface-alt": "#F5F8F7", // the light section's own PAGE background (off-white, not pure white — so white cards still read as raised)
+        "marine-frost": "#D9F0F8", // light ocean-blue tint — hover states, secondary light backgrounds, subtle section banding
+        "marine-mist": "#EAF8FA", // pale aqua tint — alternate light banding, very light highlight fills
+        "marine-border": "#D7E6EE", // subtle light-blue border for white cards (NOT marine-cyan/15, which is calibrated for dark glass surfaces and nearly invisible on white)
+        "marine-ink": "#0B2B45", // primary text/heading color ON light surfaces (dark navy — this is the "dark text on light background" half of the contrast rule)
+        "marine-ink-muted": "#4B6478", // secondary/body text on light surfaces — slate-blue-gray, never marine-white/marine-cyan-light on a light background
       },
       fontFamily: {
         sans: [

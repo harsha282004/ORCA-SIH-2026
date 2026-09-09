@@ -23,29 +23,32 @@ function fmt(dt?: string | null): string | null {
   }
 }
 
+// Theme correction: yellow-400/pink-400 read fine on dark navy but wash
+// out to near-illegible on white — darkened to AA-readable equivalents,
+// same semantic hue family.
 const SEVERITY_TEXT: Record<string, string> = {
-  INFO: "text-marine-white/60",
-  ADVISORY: "text-yellow-400",
+  INFO: "text-marine-ink-muted",
+  ADVISORY: "text-[#92600A]",
   WARNING: "text-marine-warning",
   DANGER: "text-marine-danger",
-  CRITICAL: "text-pink-400",
+  CRITICAL: "text-[#9D174D]",
 };
 
 export function CycloneCard({ hazards }: { hazards: Hazard[] }) {
   const cyclones = hazards.filter((h) => h.hazard_type === "CYCLONE");
 
   return (
-    <div className="rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-5">
-      <h3 className="text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">Cyclone</h3>
+    <div className="rounded-2xl border border-marine-border bg-marine-surface p-5 shadow-sm">
+      <h3 className="text-sm font-semibold uppercase tracking-wide text-marine-blue">Cyclone</h3>
       {cyclones.length === 0 ? (
         <p className="mt-3 text-base font-medium text-marine-success">NO ACTIVE CYCLONE DETECTED</p>
       ) : (
         <div className="mt-3 space-y-4">
           {cyclones.map((c, i) => (
-            <div key={i} className="space-y-1.5 text-sm text-marine-white/80">
+            <div key={i} className="space-y-1.5 text-sm text-marine-ink-muted">
               <div className="flex items-baseline justify-between gap-2">
-                <span className="text-lg font-semibold text-marine-white">{c.title}</span>
-                <span className={`text-sm font-semibold ${SEVERITY_TEXT[c.severity] ?? "text-marine-white/70"}`}>{c.severity}</span>
+                <span className="text-lg font-semibold text-marine-ink">{c.title}</span>
+                <span className={`text-sm font-semibold ${SEVERITY_TEXT[c.severity] ?? "text-marine-ink-muted"}`}>{c.severity}</span>
               </div>
               <p>Status: ACTIVE (currently reported by the issuing authority)</p>
               {(c.valid_from || c.valid_until) && (
@@ -55,8 +58,8 @@ export function CycloneCard({ hazards }: { hazards: Hazard[] }) {
               )}
               {c.distance_km != null && <p>Distance from selected location: {c.distance_km.toFixed(0)} km</p>}
               <p>Source: {c.source}</p>
-              {c.observed_at && <p className="text-xs text-marine-white/50">Updated: {fmt(c.observed_at)}</p>}
-              {c.description && <p className="text-xs italic leading-relaxed text-marine-white/50">{c.description}</p>}
+              {c.observed_at && <p className="text-xs text-marine-ink-muted/80">Updated: {fmt(c.observed_at)}</p>}
+              {c.description && <p className="text-xs italic leading-relaxed text-marine-ink-muted/80">{c.description}</p>}
             </div>
           ))}
         </div>
@@ -69,22 +72,22 @@ export function ThunderstormCard({ hazards }: { hazards: Hazard[] }) {
   const proxy = hazards.find((h) => h.hazard_type === "THUNDERSTORM_PROXY");
 
   return (
-    <div className="rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-5">
+    <div className="rounded-2xl border border-marine-border bg-marine-surface p-5 shadow-sm">
       <div className="flex items-center gap-2">
-        <CloudLightning size={16} className="text-marine-cyan-light" />
-        <h3 className="text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">Thunderstorm Proxy</h3>
+        <CloudLightning size={16} className="text-marine-blue" />
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-marine-blue">Thunderstorm Proxy</h3>
       </div>
       {!proxy ? (
         <p className="mt-3 text-base font-medium text-marine-success">NO SIGNIFICANT THUNDERSTORM ACTIVITY FORECAST</p>
       ) : (
-        <div className="mt-3 space-y-1.5 text-sm text-marine-white/80">
+        <div className="mt-3 space-y-1.5 text-sm text-marine-ink-muted">
           <p className="text-lg font-semibold text-marine-warning">Status: ELEVATED</p>
           {proxy.observed_at && <p>Forecast hour: {fmt(proxy.observed_at)}</p>}
           <p>Risk: {proxy.severity}</p>
           <p>Source: {proxy.source}</p>
         </div>
       )}
-      <p className="mt-3 flex items-start gap-1.5 text-xs italic leading-relaxed text-marine-white/40">
+      <p className="mt-3 flex items-start gap-1.5 text-xs italic leading-relaxed text-marine-ink-muted/70">
         <Wind size={12} className="mt-0.5 shrink-0" />
         No public real-time lightning-detection API exists for this region (DAMINI/IMD is the authoritative source and is not
         integrated). This is a WMO weather-code forecast proxy, never real-time lightning detection.

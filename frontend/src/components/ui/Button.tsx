@@ -15,13 +15,19 @@ import { Loader2 } from "lucide-react";
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 export type ButtonSize = "sm" | "md" | "lg";
 
+// Theme correction: every real call site for this component lives on a
+// LIGHT app-page surface now (Dashboard/Fishing/Safety/Route Planner/Ask
+// ORCA all moved off marine-deep — see each page's own redesign notes).
+// "secondary"/"ghost" used to be light-cyan-on-transparent, calibrated for
+// a dark glass surface — on white that's ~1.5:1 contrast, functionally
+// invisible. Both are now genuinely readable on white/off-white.
 const BASE =
-  "inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marine-cyan-light focus-visible:ring-offset-2 focus-visible:ring-offset-marine-deep disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marine-blue focus-visible:ring-offset-2 focus-visible:ring-offset-marine-surface disabled:cursor-not-allowed disabled:opacity-50";
 
 const VARIANT: Record<ButtonVariant, string> = {
   primary: "bg-marine-cyan text-marine-deep hover:bg-marine-cyan-light",
-  secondary: "border border-marine-cyan/30 bg-marine-cyan/10 text-marine-cyan-light hover:border-marine-cyan hover:bg-marine-cyan/20",
-  ghost: "border border-marine-white/15 text-marine-white/80 hover:border-marine-white/40 hover:bg-marine-white/5",
+  secondary: "border border-marine-blue/30 bg-marine-mist text-marine-blue hover:border-marine-blue hover:bg-marine-frost",
+  ghost: "border border-marine-border text-marine-ink hover:border-marine-blue/40 hover:bg-marine-surface-alt",
   danger: "border border-marine-danger/40 text-marine-danger hover:bg-marine-danger/10",
 };
 

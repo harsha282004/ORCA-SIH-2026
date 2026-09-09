@@ -208,24 +208,24 @@ export function MarineMapPage() {
     null;
 
   return (
-    <main className="min-h-screen bg-marine-deep pt-20">
+    <main className="min-h-screen bg-marine-surface-alt pt-20">
       <div className="mx-auto flex max-w-7xl flex-col gap-6 px-6 py-10 sm:px-10 lg:px-16 lg:py-14">
         <div>
-          <p className="text-xs font-medium uppercase tracking-[0.3em] text-marine-cyan-light">Marine Data Foundation</p>
-          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-marine-white sm:text-4xl">Marine Intelligence Map.</h1>
-          <p className="mt-4 max-w-3xl text-base leading-relaxed text-marine-white/70">
+          <p className="text-xs font-medium uppercase tracking-[0.3em] text-marine-blue">Marine Data Foundation</p>
+          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-marine-ink sm:text-4xl">Marine Intelligence Map.</h1>
+          <p className="mt-4 max-w-3xl text-base leading-relaxed text-marine-ink-muted">
             Explore real marine conditions and ORCA's deterministic intelligence across the Mangaluru–Udupi demo region — bathymetry,
             chlorophyll, and SST here are real, acquired samples, not continuous fields; risk and fishing suitability are computed live by
             ORCA's own deterministic engines. To plan a route, use the{" "}
-            <a href="/route-planner" className="text-marine-cyan-light underline hover:text-marine-cyan">
+            <a href="/route-planner" className="text-marine-blue underline hover:text-marine-cyan">
               Route Planner
             </a>
             ; for ranked candidate fishing areas and comparisons, visit{" "}
-            <a href="/fishing" className="text-marine-cyan-light underline hover:text-marine-cyan">
+            <a href="/fishing" className="text-marine-blue underline hover:text-marine-cyan">
               Fishing Intelligence
             </a>
             ; for a combined marine safety status and detected hazards, visit{" "}
-            <a href="/safety" className="text-marine-cyan-light underline hover:text-marine-cyan">
+            <a href="/safety" className="text-marine-blue underline hover:text-marine-cyan">
               Marine Safety
             </a>
             .
@@ -237,7 +237,7 @@ export function MarineMapPage() {
             sidebar to size against, unlike the Route Planner's row layout),
             so `flex-1` alone has nothing to grow into and the MapLibre
             canvas would size itself to a near-zero height at mount. */}
-        <section className="relative h-[70vh] min-h-[480px] overflow-hidden rounded-2xl border border-marine-cyan/15 lg:h-[75vh]">
+        <section className="relative h-[70vh] min-h-[480px] overflow-hidden rounded-2xl border border-marine-border lg:h-[75vh]">
           <RouteMap
             origin={MAP_CENTER_MARKER}
             destination={MAP_CENTER_MARKER}
@@ -288,13 +288,13 @@ export function MarineMapPage() {
           )}
 
           {marine.enabled.bathymetry && marine.layers.bathymetry.state.kind === "unavailable" && (
-            <div className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2 rounded-lg border border-marine-warning/40 bg-marine-deep/95 px-4 py-2 text-xs text-marine-warning shadow-lg">
+            <div className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2 rounded-lg border border-marine-warning/50 bg-marine-surface px-4 py-2 text-xs font-medium text-[#92600A] shadow-lg">
               Bathymetry — DATA INTEGRATION NOT CURRENTLY AVAILABLE ({marine.layers.bathymetry.state.reason})
             </div>
           )}
 
           {layerError && (
-            <div className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2 rounded-lg border border-marine-danger/40 bg-marine-deep/95 px-4 py-2 text-xs text-marine-danger shadow-lg">
+            <div className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2 rounded-lg border border-marine-danger/40 bg-marine-surface px-4 py-2 text-xs font-medium text-marine-danger shadow-lg">
               {layerError}
             </div>
           )}

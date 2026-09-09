@@ -54,41 +54,42 @@ export function deriveDataState(row: Pick<EvidenceRow, "freshness" | "confidence
 }
 
 const STATE_STYLE: Record<DataState, string> = {
-  LIVE: "border-marine-success/40 bg-marine-success/15 text-marine-success",
-  CACHED: "border-marine-sand/40 bg-marine-sand/15 text-marine-sand",
-  STALE: "border-marine-warning/40 bg-marine-warning/15 text-marine-warning",
-  STATIC: "border-marine-white/25 bg-marine-white/10 text-marine-white/70",
-  PARTIAL: "border-marine-warning/40 bg-marine-warning/10 text-marine-warning",
-  UNAVAILABLE: "border-marine-danger/40 bg-marine-danger/15 text-marine-danger",
-  "NON-AUTHORITATIVE": "border-marine-white/25 bg-marine-white/10 text-marine-white/60",
+  LIVE: "border-marine-success/40 bg-marine-success/10 text-marine-success",
+  CACHED: "border-marine-sand/50 bg-marine-sand/15 text-[#8A5A2B]",
+  STALE: "border-marine-warning/50 bg-marine-warning/10 text-[#92600A]",
+  STATIC: "border-marine-border bg-marine-surface-alt text-marine-ink-muted",
+  PARTIAL: "border-marine-warning/50 bg-marine-warning/10 text-[#92600A]",
+  UNAVAILABLE: "border-marine-danger/40 bg-marine-danger/10 text-marine-danger",
+  "NON-AUTHORITATIVE": "border-marine-border bg-marine-surface-alt text-marine-ink-muted",
 };
 
 export function DataStateBadge({ state }: { state: DataState }) {
   return <span className={`inline-block rounded-full border px-2.5 py-1 text-xs font-semibold uppercase tracking-wide ${STATE_STYLE[state]}`}>{state}</span>;
 }
 
-// Redesign (Phase 11 typography pass) — every size below was raised at
-// least one step: 10px labels -> xs (12px), the primary value 18px -> 24px
-// semibold, card padding 12px -> 20px. Card MIN-HEIGHT is fixed so a grid
-// row of cards never looks jagged when one card has a `details` line and
-// its neighbor doesn't.
+// Theme correction: this card used to be a translucent dark-glass tile
+// (bg-marine-deep/60, white text) — correct on the old all-dark app pages,
+// unreadable on the white/off-white surfaces those pages now use. It is
+// now a genuine white card, matching task §16's "LIGHT SECTION CARDS:
+// background white, border subtle light blue/gray, heading dark navy,
+// body muted blue-gray."
 export function EvidenceCard({ row }: { row: EvidenceRow }) {
   const state = deriveDataState(row);
   return (
-    <div className="flex min-h-[168px] flex-col rounded-2xl border border-marine-cyan/15 bg-marine-deep/60 p-5">
+    <div className="flex min-h-[168px] flex-col rounded-2xl border border-marine-border bg-marine-surface p-5 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-marine-cyan-light">{row.source}</p>
-          <p className="mt-0.5 text-sm text-marine-white/70">{row.variable}</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-marine-blue">{row.source}</p>
+          <p className="mt-0.5 text-sm text-marine-ink-muted">{row.variable}</p>
         </div>
         <DataStateBadge state={state} />
       </div>
-      <p className="mt-3 text-2xl font-semibold leading-tight text-marine-white">{row.value}</p>
-      <dl className="mt-3 space-y-1.5 text-xs text-marine-white/50">
+      <p className="mt-3 text-2xl font-semibold leading-tight text-marine-ink">{row.value}</p>
+      <dl className="mt-3 space-y-1.5 text-xs text-marine-ink-muted">
         {row.timestamp && (
           <div className="flex justify-between gap-2">
             <dt>Updated</dt>
-            <dd className="text-right text-marine-white/70">{new Date(row.timestamp).toLocaleString()}</dd>
+            <dd className="text-right text-marine-ink-muted">{new Date(row.timestamp).toLocaleString()}</dd>
           </div>
         )}
         {row.freshness && (
@@ -102,27 +103,27 @@ export function EvidenceCard({ row }: { row: EvidenceRow }) {
         {row.coverage && (
           <div className="flex justify-between gap-2">
             <dt>Coverage</dt>
-            <dd className="text-right text-marine-white/70">{row.coverage}</dd>
+            <dd className="text-right text-marine-ink-muted">{row.coverage}</dd>
           </div>
         )}
         {row.confidence != null && (
           <div className="flex justify-between gap-2">
             <dt>Confidence</dt>
-            <dd className="text-right text-marine-white/70">{(row.confidence * 100).toFixed(0)}%</dd>
+            <dd className="text-right text-marine-ink-muted">{(row.confidence * 100).toFixed(0)}%</dd>
           </div>
         )}
       </dl>
-      {row.details && <p className="mt-3 text-xs italic leading-relaxed text-marine-white/40">{row.details}</p>}
+      {row.details && <p className="mt-3 text-xs italic leading-relaxed text-marine-ink-muted/80">{row.details}</p>}
     </div>
   );
 }
 
 export function EvidenceList({ title, rows }: { title?: string; rows: EvidenceRow[] }) {
   return (
-    <section className="rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-6">
-      {title && <h2 className="mb-4 text-base font-semibold uppercase tracking-wide text-marine-cyan-light">{title}</h2>}
+    <section className="rounded-2xl border border-marine-border bg-marine-surface-alt p-6">
+      {title && <h2 className="mb-4 text-base font-semibold uppercase tracking-wide text-marine-ink">{title}</h2>}
       {rows.length === 0 ? (
-        <p className="text-sm text-marine-white/50">No evidence is available for this result.</p>
+        <p className="text-sm text-marine-ink-muted">No evidence is available for this result.</p>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {rows.map((row, i) => (

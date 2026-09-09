@@ -155,17 +155,17 @@ export function FishingPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-marine-deep pt-20">
+    <main className="min-h-screen bg-marine-surface-alt pt-20">
       <div className="mx-auto flex max-w-7xl flex-col gap-6 px-6 py-10 sm:px-10 lg:px-16 lg:py-14">
         <div>
-          <p className="text-xs font-medium uppercase tracking-[0.3em] text-marine-cyan-light">Deterministic Decision Support</p>
-          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-marine-white sm:text-4xl">Fishing Intelligence.</h1>
-          <p className="mt-4 max-w-3xl text-base leading-relaxed text-marine-white/70">
+          <p className="text-xs font-medium uppercase tracking-[0.3em] text-marine-blue">Deterministic Decision Support</p>
+          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-marine-ink sm:text-4xl">Fishing Intelligence.</h1>
+          <p className="mt-4 max-w-3xl text-base leading-relaxed text-marine-ink-muted">
             ORCA Fishing Suitability is environmental decision support, computed by ORCA's own deterministic engines — it is{" "}
-            <strong className="text-marine-white">not</strong> fish detection and does not guarantee a catch. It is a separate system
+            <strong className="text-marine-ink">not</strong> fish detection and does not guarantee a catch. It is a separate system
             from the official INCOIS PFZ advisory (see the PFZ Reference card below). For what-if scenarios ("what if waves reach 3
             metres there?") or the best time to fish across a window, ask{" "}
-            <a href="/ask-orca" className="text-marine-cyan-light underline hover:text-marine-cyan">
+            <a href="/ask-orca" className="text-marine-blue underline hover:text-marine-cyan">
               Ask ORCA
             </a>
             , or use the Time Window panel for a specific area.
@@ -182,7 +182,7 @@ export function FishingPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder='e.g. "Find suitable fishing areas near Mangaluru tomorrow morning"'
-            className="flex-1 rounded-full border border-marine-cyan/25 bg-marine-deep/60 px-4 py-2.5 text-sm text-marine-white placeholder:text-marine-white/40 focus:border-marine-cyan focus:outline-none focus-visible:ring-2 focus-visible:ring-marine-cyan"
+            className="flex-1 rounded-full border border-marine-cyan/25 bg-marine-surface px-4 py-2.5 text-sm text-marine-ink placeholder:text-marine-ink-muted focus:border-marine-cyan focus:outline-none focus-visible:ring-2 focus-visible:ring-marine-cyan"
           />
           <Button type="submit" disabled={asking || !query.trim()} loading={asking}>
             <Search size={15} />
@@ -191,8 +191,8 @@ export function FishingPage() {
         </form>
 
         {askResult && (
-          <div className="rounded-xl border border-marine-cyan/20 bg-marine-ocean/40 p-4 text-sm text-marine-white">
-            <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-marine-cyan-light">
+          <div className="rounded-xl border border-marine-border bg-marine-surface p-4 text-sm text-marine-ink shadow-sm">
+            <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-marine-blue">
               <Sparkles size={13} /> ORCA{askResult.usedFallback ? " (deterministic template)" : ""}
             </p>
             <p className="mt-2 leading-relaxed">{askResult.explanation}</p>
@@ -203,24 +203,24 @@ export function FishingPage() {
             machine-readable INCOIS PFZ dataset and no reference snapshot
             file (data/reference/pfz/) exist in this deployment — never
             fabricated as a live layer or inferred from an image. */}
-        <div className="rounded-2xl border border-marine-cyan/15 bg-marine-ocean/20 p-5">
+        <div className="rounded-2xl border border-marine-border bg-marine-surface p-5 shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">INCOIS PFZ Reference</p>
-              <p className="mt-1 text-sm text-marine-white/60">Official Potential Fishing Zone advisory — Indian National Centre for Ocean Information Services (INCOIS).</p>
+              <p className="text-sm font-semibold uppercase tracking-wide text-marine-blue">INCOIS PFZ Reference</p>
+              <p className="mt-1 text-sm text-marine-ink-muted">Official Potential Fishing Zone advisory — Indian National Centre for Ocean Information Services (INCOIS).</p>
             </div>
-            <span className="rounded-full border border-marine-white/25 bg-marine-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-marine-white/70">
+            <span className="rounded-full border border-marine-border bg-marine-surface-alt px-3 py-1 text-xs font-semibold uppercase tracking-wide text-marine-ink-muted">
               Reference Snapshot — Unavailable
             </span>
           </div>
-          <p className="mt-3 text-xs leading-relaxed text-marine-white/40">
+          <p className="mt-3 text-xs leading-relaxed text-marine-ink-muted">
             No machine-readable INCOIS PFZ dataset is integrated, and no reference snapshot file is present in this deployment. ORCA
             never infers PFZ coordinates from an advisory image and never labels its own suitability areas below as official PFZ.
           </p>
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_400px]">
-          <section className="relative h-[70vh] min-h-[520px] overflow-hidden rounded-2xl border border-marine-cyan/15">
+          <section className="relative h-[70vh] min-h-[520px] overflow-hidden rounded-2xl border border-marine-border">
             <RouteMap
               origin={REGION_CENTER}
               destination={REGION_CENTER}
@@ -246,12 +246,12 @@ export function FishingPage() {
           </section>
 
           <section className="flex flex-col gap-4">
-            <div className="rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-5">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">Best Available Areas</h2>
-              {candidates.state.kind === "loading" && <p className="mt-3 text-sm text-marine-white/50">Evaluating candidate areas…</p>}
+            <div className="rounded-2xl border border-marine-border bg-marine-surface shadow-sm p-5">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-blue">Best Available Areas</h2>
+              {candidates.state.kind === "loading" && <p className="mt-3 text-sm text-marine-ink-muted">Evaluating candidate areas…</p>}
               {candidates.state.kind === "error" && <p className="mt-3 text-sm text-marine-danger">{candidates.state.message}</p>}
               {topAreas.length === 0 && candidates.state.kind === "loaded" && (
-                <p className="mt-3 text-sm text-marine-white/50">No candidate area currently passes ORCA's deterministic safety/risk/suitability checks.</p>
+                <p className="mt-3 text-sm text-marine-ink-muted">No candidate area currently passes ORCA's deterministic safety/risk/suitability checks.</p>
               )}
               <div className="mt-4 space-y-3">
                 {topAreas.map((area, i) => (
@@ -263,7 +263,7 @@ export function FishingPage() {
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ") setSelected({ layer: "fishing-candidate", properties: area.properties as unknown as Record<string, unknown> });
                     }}
-                    className="cursor-pointer rounded-xl border border-marine-cyan/15 bg-marine-deep/40 p-4 text-marine-white transition-colors hover:border-marine-cyan/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marine-cyan"
+                    className="cursor-pointer rounded-xl border border-marine-border bg-marine-surface p-4 text-marine-ink shadow-sm transition-colors hover:border-marine-blue/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marine-cyan"
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span className="flex items-center gap-2.5 text-lg font-semibold">
@@ -285,7 +285,7 @@ export function FishingPage() {
                           const [lon, lat] = area.geometry.coordinates;
                           void loadTemporal(lat, lon);
                         }}
-                        className="rounded-full p-1.5 text-marine-white/50 hover:bg-marine-cyan/15 hover:text-marine-cyan-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marine-cyan"
+                        className="rounded-full p-1.5 text-marine-ink-muted hover:bg-marine-cyan/15 hover:text-marine-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marine-cyan"
                         aria-label={`Show time window for ${candidateLabel(area, i)}`}
                       >
                         <Clock size={16} />
@@ -293,23 +293,23 @@ export function FishingPage() {
                     </div>
                     <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
                       <div>
-                        <p className="text-xs uppercase tracking-wide text-marine-white/40">Suitability</p>
+                        <p className="text-xs uppercase tracking-wide text-marine-ink-muted">Suitability</p>
                         <p className="mt-0.5 font-semibold text-marine-success">{area.properties.suitability_category}</p>
                       </div>
                       <div>
-                        <p className="text-xs uppercase tracking-wide text-marine-white/40">Risk</p>
-                        <p className="mt-0.5 font-semibold text-marine-white">{area.properties.risk_level}</p>
+                        <p className="text-xs uppercase tracking-wide text-marine-ink-muted">Risk</p>
+                        <p className="mt-0.5 font-semibold text-marine-ink">{area.properties.risk_level}</p>
                       </div>
                       {area.properties.environmental_context?.wave_height_m != null && (
                         <div>
-                          <p className="text-xs uppercase tracking-wide text-marine-white/40">Wave</p>
-                          <p className="mt-0.5 text-marine-white/80">{area.properties.environmental_context.wave_height_m.toFixed(2)} m</p>
+                          <p className="text-xs uppercase tracking-wide text-marine-ink-muted">Wave</p>
+                          <p className="mt-0.5 text-marine-ink-muted">{area.properties.environmental_context.wave_height_m.toFixed(2)} m</p>
                         </div>
                       )}
                       {area.properties.distance_km != null && (
                         <div>
-                          <p className="text-xs uppercase tracking-wide text-marine-white/40">Distance</p>
-                          <p className="mt-0.5 text-marine-white/80">{area.properties.distance_km.toFixed(1)} km</p>
+                          <p className="text-xs uppercase tracking-wide text-marine-ink-muted">Distance</p>
+                          <p className="mt-0.5 text-marine-ink-muted">{area.properties.distance_km.toFixed(1)} km</p>
                         </div>
                       )}
                     </div>
@@ -319,9 +319,9 @@ export function FishingPage() {
             </div>
 
             {(temporalLoading || temporal) && (
-              <div className="rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-5">
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">Time Window (real hourly forecast)</h2>
-                {temporalLoading && <p className="mt-3 text-sm text-marine-white/50">Evaluating real forecast hours…</p>}
+              <div className="rounded-2xl border border-marine-border bg-marine-surface shadow-sm p-5">
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-blue">Time Window (real hourly forecast)</h2>
+                {temporalLoading && <p className="mt-3 text-sm text-marine-ink-muted">Evaluating real forecast hours…</p>}
                 {temporal && (
                   <>
                     <div className="mt-3">
@@ -348,7 +348,7 @@ export function FishingPage() {
                         }
                       />
                     </div>
-                    <p className="mt-2 text-sm text-marine-white/60">
+                    <p className="mt-2 text-sm text-marine-ink-muted">
                       {temporal.recommended_index !== null
                         ? `Best available time: ${new Date(temporal.series[temporal.recommended_index].timestamp).toLocaleString()} (highest suitability among hours that passed safety checks).`
                         : "No hour in this window currently passes ORCA's deterministic safety checks."}
@@ -359,8 +359,8 @@ export function FishingPage() {
             )}
 
             {compareSelection.length === 2 && (
-              <div className="rounded-2xl border border-marine-cyan/15 bg-marine-ocean/30 p-5">
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-cyan-light">Compare Areas</h2>
+              <div className="rounded-2xl border border-marine-border bg-marine-surface shadow-sm p-5">
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-marine-blue">Compare Areas</h2>
                 <Button variant="secondary" size="sm" onClick={runCompare} disabled={comparing} loading={comparing} className="mt-3 w-full">
                   {comparing ? "Comparing…" : `Compare ${candidateLabel(topAreas[compareSelection[0]], compareSelection[0])} vs ${candidateLabel(topAreas[compareSelection[1]], compareSelection[1])}`}
                 </Button>
@@ -376,7 +376,7 @@ export function FishingPage() {
                         sublabel: topAreas[i].properties.risk_level ?? undefined,
                       }))}
                     />
-                    <p className="mt-2 text-sm leading-relaxed text-marine-white/80">{compareResult.reason}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-marine-ink-muted">{compareResult.reason}</p>
                   </>
                 )}
               </div>
